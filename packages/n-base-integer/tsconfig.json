@@ -5,6 +5,5 @@
     "paths": {
       "@n-base-integer/*": ["src/*"]
     }
-  },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  }
 }
