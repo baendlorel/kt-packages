@@ -48,16 +48,26 @@ export const getPackageGroup = (who: string | undefined) => {
 
 export const getPackageInfo = (who: string | undefined) => {
   if (!who) {
-    console.error('No package group specified.');
+    console.error('getPackageInfo: No package specified.');
     process.exit(1);
   }
 
-  const packageJsonPath = join(import.meta.dirname, '..', '..', 'packages', who, 'package.json');
+  const packagePath = getPackagePath(who);
+  const packageJsonPath = join(packagePath, 'package.json');
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
   return {
-    path: packageJsonPath,
+    path: packagePath,
+    jsonPath: packageJsonPath,
     version: new Version(packageJson.version),
     json: packageJson,
     name: packageJson.name as string,
   };
+};
+
+export const getPackagePath = (who: string | undefined) => {
+  if (!who) {
+    console.log('getPackagePath: No package specified.');
+    process.exit(1);
+  }
+  return join(import.meta.dirname, '..', '..', 'packages', who);
 };
