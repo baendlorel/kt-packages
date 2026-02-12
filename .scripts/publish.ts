@@ -25,7 +25,7 @@ export async function publish(who: string | undefined) {
   console.log(`Updated ${info.name} to version ${newVersionStr}`);
 
   execSync(`git commit -am "release: ${newVersionStr}"`, { stdio: 'inherit' });
-  execSync(`git tag v${getTagName(who)}-${newVersionStr}`, { stdio: 'inherit' });
+  execSync(`git tag v${info.name}@${newVersionStr}`, { stdio: 'inherit' });
 
   const env = { ...process.env, LIB_PACKAGE_PATH: dirname(info.path) };
   execSync(`pnpm --filter ${info.name} build`, { stdio: 'inherit', env });
