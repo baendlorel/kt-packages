@@ -1,13 +1,22 @@
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { getVitestAliases } from './.scripts/aliases';
 
-export default defineConfig(() => {
-  const packageDirs = readdirSync(path.join(import.meta.dirname, 'packages'));
+const packagesDir = path.resolve('packages');
+function getVitestAliases() {
+  const packageDirs = readdirSync(packagesDir);
   const alias: Record<string, string> = {};
   for (const dir of packageDirs) {
-    alias[`@${dir}`] = path.join(import.meta.dirname, 'packages', dir, 'src');
+    alias[`@${dir}`] = path.join(packagesDir, dir, 'src');
+  }
+  return alias;
+}
+
+export default defineConfig(() => {
+  const packageDirs = readdirSync(packagesDir);
+  const alias: Record<string, string> = {};
+  for (const dir of packageDirs) {
+    alias[`@${dir}`] = path.join(packagesDir, dir, 'src');
   }
 
   return {

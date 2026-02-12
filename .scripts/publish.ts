@@ -1,9 +1,8 @@
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
 
 import { askYesNo } from './common/ask';
-import { getPackageInfo, getTagName } from './common/package-info';
+import { getPackageInfo } from './common/package-info';
 import { Version } from './common/version';
 
 export async function publish(who: string | undefined) {
@@ -27,7 +26,7 @@ export async function publish(who: string | undefined) {
   execSync(`git commit -am "release: ${newVersionStr}"`, { stdio: 'inherit' });
   execSync(`git tag v${info.name}@${newVersionStr}`, { stdio: 'inherit' });
 
-  const env = { ...process.env, LIB_PACKAGE_PATH: dirname(info.path) };
+  const env = { ...process.env, LIB_PACKAGE_PATH: info.path };
   execSync(`pnpm --filter ${info.name} build`, { stdio: 'inherit', env });
   execSync(`pnpm --filter ${info.name} publish --no-git-checks --access public`, { stdio: 'inherit', env });
   console.log(`Published ${info.name}@${newVersionStr}`);
