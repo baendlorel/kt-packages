@@ -13,7 +13,8 @@ import { replaceOpts } from './.scripts/replace-options.js';
 import { getRollupAliases } from './.scripts/aliases.js';
 
 export default () => {
-  const packagePath = process.env.LIB_PACKAGE_PATH as string;
+  console.log('Building package at path:', process.env.LIB_PACKAGE_PATH);
+  const packagePath = process.env.LIB_PACKAGE_PATH || '';
   return [
     // * Main
     {
