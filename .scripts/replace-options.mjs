@@ -3,9 +3,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
- * @param {string} packagePath
+ * @param {string | undefined} packagePath
  */
 export function replaceOpts(packagePath) {
+  if (!packagePath) {
+    console.error('Error: LIB_PACKAGE_PATH environment variable is not set.');
+    process.exit(1);
+  }
+
   /**
    * @type {import('../package.json')}
    */

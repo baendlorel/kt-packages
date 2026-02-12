@@ -33,17 +33,9 @@ async function publish(who: string | undefined) {
   execSync(`git tag v${getTagName(who)}-${newVersionStr}`, { stdio: 'inherit' });
 
   for (const p of info) {
-    execSync(`pnpm --filter ${p.name} build`, { stdio: 'inherit' });
-
-    // & special deal with tsplugin place
-    if (p.name === '@ktjs/ts-plugin-jsx-dom') {
-      console.log('Moving dist/index.js to index.js for ts-plugin-jsx-dom');
-      const distIndexJSPath = join(import.meta.dirname, '..', 'packages', 'ts-plugin-jsx-dom', 'dist', 'index.js');
-      const distIndexJSPath2 = join(import.meta.dirname, '..', 'packages', 'ts-plugin-jsx-dom', 'index.js');
-      renameSync(distIndexJSPath, distIndexJSPath2);
-    }
-
-    execSync(`pnpm --filter ${p.name} publish --no-git-checks --access public`, { stdio: 'inherit' });
+    const env = { ...process.env, LIB_PACKAGE_PATH: p.name };
+    execSync(`pnpm --filter ${p.name} build`, { stdio: 'inherit', env });
+    execSync(`pnpm --filter ${p.name} publish --no-git-checks --access public`, { stdio: 'inherit', env });
     console.log(`Published ${p.name}@${newVersionStr}`);
   }
 

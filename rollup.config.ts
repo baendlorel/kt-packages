@@ -46,7 +46,7 @@ export default [
 
     plugins: [
       alias(aliasOpts),
-      replace(replaceOpts),
+      replace(replaceOpts(process.env.LIB_PACKAGE_PATH)),
       resolve(),
       commonjs(),
       typescript({ tsconfig }),
