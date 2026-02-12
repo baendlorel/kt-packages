@@ -1,9 +1,10 @@
 import { execSync } from 'node:child_process';
+import { dirname } from 'node:path';
 import { getPackageInfo } from './common/package-info';
 
 export async function build(who: string | undefined) {
   const info = getPackageInfo(who);
-  const env = { ...process.env, LIB_PACKAGE_PATH: info.name };
+  const env = { ...process.env, LIB_PACKAGE_PATH: dirname(info.path) };
 
   if (info.json.scripts?.build) {
     execSync(`pnpm --filter ${info.name} build`, { stdio: 'inherit', env });
