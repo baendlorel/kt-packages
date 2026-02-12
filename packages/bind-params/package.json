@@ -29,9 +29,9 @@
     "javascript"
   ],
   "scripts": {
-    "test": "clear & vitest",
+    "test": "vitest --config ../../vitest.config.ts",
     "lint": "oxlint .",
-    "cover": "clear & vitest --coverage",
+    "cover": "vitest --coverage",
     "build": "rollup --config ../../rollup.config.ts --configPlugin typescript"
   },
   "license": "MIT",
