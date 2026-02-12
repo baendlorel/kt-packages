@@ -10,29 +10,19 @@ import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import dts from 'rollup-plugin-dts';
 
-// custom plugins
-import { replaceOpts } from './.scripts/replace-options.mjs';
+import { replaceOpts } from './.scripts/replace-options.js';
 
 // # common options
 
-/**
- * build config
- */
 const tsconfig = './tsconfig.build.json';
 
-/**
- * @type {import('@rollup/plugin-alias').RollupAliasOptions}
- */
 const aliasOpts = {
   entries: [{ find: /^@/, replacement: path.resolve(import.meta.dirname, 'src') }],
 };
 
 // # main options
 
-/**
- * @type {import('rollup').RollupOptions[]}
- */
-export default [
+export default () => [
   // * Main
   {
     input: 'src/index.ts',
@@ -72,6 +62,6 @@ export default [
   {
     input: 'src/index.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [alias(aliasOpts), replace(replaceOpts), dts({ tsconfig })],
+    plugins: [alias(aliasOpts), replace(replaceOpts(process.env.LIB_PACKAGE_PATH)), dts({ tsconfig })],
   },
 ];

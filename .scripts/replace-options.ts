@@ -1,20 +1,31 @@
 // @ts-check
+import { RollupReplaceOptions } from '@rollup/plugin-replace';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-/**
- * @param {string | undefined} packagePath
- */
-export function replaceOpts(packagePath) {
+interface CommonPackageJson {
+  name: string;
+  version: string;
+  description: string;
+  description_zh: string;
+  author: {
+    name: string;
+    email: string;
+  };
+  license: string;
+  repository: {
+    type: string;
+    url: string;
+  };
+}
+
+export function replaceOpts(packagePath: string | undefined) {
   if (!packagePath) {
     console.error('Error: LIB_PACKAGE_PATH environment variable is not set.');
     process.exit(1);
   }
 
-  /**
-   * @type {import('../package.json')}
-   */
-  const pkg = JSON.parse(readFileSync(join(packagePath, 'package.json'), 'utf-8'));
+  const pkg = JSON.parse(readFileSync(join(packagePath, 'package.json'), 'utf-8')) as CommonPackageJson;
 
   function formatDateFull(dt = new Date()) {
     const y = dt.getFullYear();
@@ -41,10 +52,7 @@ export function replaceOpts(packagePath) {
  * @description ${pkg.description.replace(/\n/g, '\n * \n * ')}
  * @copyright Copyright (c) ${new Date().getFullYear()} ${pkg.author.name}. All rights reserved.`;
 
-  /**
-   * @type {import('@rollup/plugin-replace').RollupReplaceOptions}
-   */
-  const replaceOpts = {
+  const replaceOpts: RollupReplaceOptions = {
     preventAssignment: true,
     delimiters: ['', ''],
     values: {
