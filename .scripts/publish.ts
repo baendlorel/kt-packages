@@ -1,9 +1,9 @@
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
-import { askYesNo } from './common/ask';
-import { getPackageInfo } from './common/package-info';
-import { Version } from './common/version';
+import { askYesNo } from './common/ask.js';
+import { getPackageInfo } from './common/package-info.js';
+import { Version } from './common/version.js';
 
 export async function publish(who: string | undefined) {
   const info = getPackageInfo(who);

@@ -1,13 +1,14 @@
 // @ts-check
 import path from 'node:path';
 import { readdirSync, readFileSync } from 'node:fs';
+import { type RollupReplaceOptions } from '@rollup/plugin-replace';
 
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import alias from '@rollup/plugin-alias';
 import terser from '@rollup/plugin-terser';
-import replace, { type RollupReplaceOptions } from '@rollup/plugin-replace';
+import replace from '@rollup/plugin-replace';
 import dts from 'rollup-plugin-dts';
 
 interface CommonPackageJson {
@@ -96,15 +97,16 @@ function getRollupAliases() {
 }
 
 export default () => {
-  const packagesDir = path.resolve('packages');
+  const currentPackagePath = process.env.LIB_PACKAGE_PATH || '';
 
   return [
     // * Main
     {
-      input: path.join(packagesDir, 'src', 'index.ts'),
+      // todo 需要找到正确的 packagePath，如何操作?
+      input: path.join(currentPackagePath, 'src', 'index.ts'),
       output: [
         {
-          file: path.join(packagesDir, 'dist', 'index.mjs'),
+          file: path.join(currentPackagePath, 'dist', 'index.mjs'),
           format: 'esm',
           sourcemap: false,
         },
@@ -112,7 +114,7 @@ export default () => {
 
       plugins: [
         alias(getRollupAliases()),
-        replace(replaceOpts(process.env.LIB_PACKAGE_PATH)),
+        replace(replaceOpts(currentPackagePath)),
         resolve(),
         commonjs(),
         typescript(),
@@ -136,15 +138,9 @@ export default () => {
     },
     // * Declarations
     {
-      input: path.join(packagePath, 'src', 'index.ts'),
-      output: [{ file: path.join(packagePath, 'dist', 'index.d.ts'), format: 'es' }],
-      plugins: [
-        alias(getRollupAliases()),
-        replace(replaceOpts(process.env.LIB_PACKAGE_PATH)),
-        dts({
-          tsconfig: packageTsconfig,
-        }),
-      ],
+      input: path.join(currentPackagePath, 'src', 'index.ts'),
+      output: [{ file: path.join(currentPackagePath, 'dist', 'index.d.ts'), format: 'es' }],
+      plugins: [alias(getRollupAliases()), replace(replaceOpts(currentPackagePath)), dts()],
     },
   ];
 };

@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
-import { build } from './build';
-import { publish } from './publish';
-import { test } from './test';
+import { build } from './build.js';
+import { publish } from './publish.js';
+import { test } from './test.js';
 
 const task = process.argv[2];
 const [who] = process.argv.slice(3);

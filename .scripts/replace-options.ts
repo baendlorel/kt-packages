@@ -1,7 +1,7 @@
 // @ts-check
-import { RollupReplaceOptions } from '@rollup/plugin-replace';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { RollupReplaceOptions } from '@rollup/plugin-replace';
 
 interface CommonPackageJson {
   name: string;
