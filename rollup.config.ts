@@ -1,4 +1,3 @@
-// @ts-check
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 
@@ -9,6 +8,7 @@ import alias from '@rollup/plugin-alias';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import dts from 'rollup-plugin-dts';
+
 import { getRollupAliases } from '.scripts/aliases.js';
 import { replaceOpts } from '.scripts/replace-options.js';
 
@@ -23,12 +23,9 @@ const getTsConfigPath = (packagePath: string) => {
 export default () => {
   const currentPackagePath = process.env.LIB_PACKAGE_PATH || '';
   const tsconfigPath = getTsConfigPath(currentPackagePath);
-  console.log(`Building package at ${currentPackagePath} using tsconfig: ${tsconfigPath}`);
-
   return [
     // * Main
     {
-      // todo 需要找到正确的 packagePath，如何操作?
       input: path.join(currentPackagePath, 'src', 'index.ts'),
       output: [
         {

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "declaration": false, // false to let rollup handle it
     "esModuleInterop": true,
     "strict": true
   },
-  "include": ["packages/**/*.ts", "packages/**/tests/**/*.ts", "rollup.config.ts", ".scripts/**/*.ts"]
+  "include": ["rollup.config.ts", ".scripts/**/*.ts"]
 }
