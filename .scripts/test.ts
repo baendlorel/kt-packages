@@ -8,7 +8,6 @@ export async function test(who: string | undefined) {
 
   const vitestConfigPath = resolve('vitest.config.ts');
   const testPackageDir = resolve(info.path, '..', 'tests');
-
   console.log('testPackageDir', testPackageDir);
 
   if (info.json.scripts?.test) {
