@@ -5,5 +5,6 @@
     "paths": {
       "@bind-params/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts"]
 }
