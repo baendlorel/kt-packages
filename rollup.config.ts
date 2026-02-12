@@ -39,7 +39,7 @@ export default () => [
       replace(replaceOpts(process.env.LIB_PACKAGE_PATH)),
       resolve(),
       commonjs(),
-      typescript({ tsconfig }),
+      typescript(),
       terser({
         format: {
           comments: false, // remove comments
@@ -62,6 +62,6 @@ export default () => [
   {
     input: 'src/index.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [alias(aliasOpts), replace(replaceOpts(process.env.LIB_PACKAGE_PATH)), dts({ tsconfig })],
+    plugins: [alias(aliasOpts), replace(replaceOpts(process.env.LIB_PACKAGE_PATH)), dts()],
   },
 ];

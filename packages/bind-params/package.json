@@ -1,39 +1,39 @@
 {
-	"name": "bind-params",
-	"version": "1.1.0",
-	"author": {
-		"name": "Kasukabe Tsumugi",
-		"email": "futami16237@gmail.com"
-	},
-	"purpose": "npm",
-	"description": "Bind the first N parameters of a function, with full type hints!",
-	"description_zh": "为函数固定前N个参数，有完整的类型提示！",
-	"type": "module",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		"types": "./dist/index.d.ts",
-		"import": "./dist/index.mjs",
-		"default": "./dist/index.mjs"
-	},
-	"files": [
-		"dist"
-	],
-	"homepage": "https://github.com/baendlorel/bind-params#readme",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/baendlorel/bind-params"
-	},
-	"keywords": [
-		"typescript",
-		"javascript"
-	],
-	"scripts": {
-		"test": "clear & vitest",
-		"lint": "oxlint .",
-		"cover": "clear & vitest --coverage",
-		"build": "rollup --config ../../rollup.config.ts --configPlugin typescript"
-	},
-	"license": "MIT",
-	"devDependencies": {}
+  "name": "bind-params",
+  "version": "1.1.1",
+  "author": {
+    "name": "Kasukabe Tsumugi",
+    "email": "futami16237@gmail.com"
+  },
+  "purpose": "npm",
+  "description": "Bind the first N parameters of a function, with full type hints!",
+  "description_zh": "为函数固定前N个参数，有完整的类型提示！",
+  "type": "module",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.mjs",
+    "default": "./dist/index.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/baendlorel/bind-params#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baendlorel/bind-params"
+  },
+  "keywords": [
+    "typescript",
+    "javascript"
+  ],
+  "scripts": {
+    "test": "clear & vitest",
+    "lint": "oxlint .",
+    "cover": "clear & vitest --coverage",
+    "build": "rollup --config ../../rollup.config.ts --configPlugin typescript"
+  },
+  "license": "MIT",
+  "devDependencies": {}
 }

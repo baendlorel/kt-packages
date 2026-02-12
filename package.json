@@ -8,6 +8,7 @@
 	"scripts": {
 		"lines": "tsx ./.scripts/lines.ts",
 		"build": "tsx ./.scripts/index.ts --build",
+		"pub": "tsx ./.scripts/index.ts --publish",
 		"test": "pnpm -r --if-present run test",
 		"cover": "pnpm -r --if-present run cover",
 		"build:root": "rollup --config rollup.config.ts --configPlugin typescript",

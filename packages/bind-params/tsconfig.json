@@ -9,7 +9,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@bind-params/*": ["src/*"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
