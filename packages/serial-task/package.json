@@ -1,0 +1,59 @@
+{
+	"name": "serial-task",
+	"version": "1.1.0",
+	"author": {
+		"name": "Kasukabe Tsumugi",
+		"email": "futami16237@gmail.com"
+	},
+	"purpose": "npm",
+	"description": "Put a list of functions in and get a composed task function. Similar to functional programming's compose (function composition), but with more fine-grained and precise control, and the generated task incurs almost no runtime overhead. Supports both synchronous and asynchronous functions.",
+	"description_zh": "将一组函数放入并获取一个组合任务函数。类似于函数式编程的函数组合，但具有更细粒度和精确的控制，生成的任务几乎没有运行时判定的额外开销。支持同步和异步函数。",
+	"type": "module",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"import": "./dist/index.mjs",
+		"default": "./dist/index.mjs"
+	},
+	"files": [
+		"dist"
+	],
+	"homepage": "https://github.com/baendlorel/serial-task#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/baendlorel/serial-task"
+	},
+	"keywords": [
+		"typescript",
+		"javascript"
+	],
+	"scripts": {
+		"lines": "clear && find ./src -type f \\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.mjs\" -o -name \"*.cjs\" -o -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.py\"  -o -name \"*.css\" -o -name \"*.rs\" -o -name \"*.rc\" \\) | xargs wc -l",
+		"test": "clear & vitest",
+		"lint": "oxlint .",
+		"cover": "clear & vitest --coverage",
+		"build": "tsx ./.scripts/rollup.ts"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@rollup/plugin-alias": "^5.1.1",
+		"@rollup/plugin-babel": "^6.0.4",
+		"@rollup/plugin-commonjs": "^28.0.6",
+		"@rollup/plugin-node-resolve": "^16.0.1",
+		"@rollup/plugin-replace": "^6.0.2",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-typescript": "^12.1.4",
+		"@types/node": "^24.3.0",
+		"@vitest/coverage-v8": "^3.2.4",
+		"oxlint": "^1.12.0",
+		"prettier": "^3.6.2",
+		"rimraf": "^6.0.1",
+		"rollup": "^4.47.1",
+		"rollup-plugin-dts": "^6.2.3",
+		"rollup-plugin-dts-merger": "^1.2.3",
+		"tslib": "^2.8.1",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	}
+}
