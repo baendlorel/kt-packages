@@ -7,7 +7,7 @@
 	"packageManager": "pnpm@10.9.0",
 	"scripts": {
 		"lines": "tsx ./.scripts/lines.ts",
-		"build": "pnpm -r --if-present run build",
+		"build": "tsx ./.scripts/build.ts",
 		"test": "pnpm -r --if-present run test",
 		"cover": "pnpm -r --if-present run cover",
 		"build:root": "rollup --config rollup.config.ts --configPlugin typescript",

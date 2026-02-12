@@ -1,13 +1,13 @@
 import { execSync } from 'node:child_process';
-import { getPackageGroup } from './common/consts';
+import { getPackageInfo } from './common/package-info';
 
 export async function build(who: string | undefined) {
-  const info = getPackageGroup(who);
-  for (const p of info) {
-    if (p.json.scripts?.build) {
-      execSync(`pnpm --filter ${p.name} build`, { stdio: 'inherit' });
-    } else {
-      console.warn(`Package ${p.name} has no test script, skipping...`);
-    }
+  const info = getPackageInfo(who);
+  const env = { ...process.env, LIB_PACKAGE_PATH: info.name };
+
+  if (info.json.scripts?.build) {
+    execSync(`pnpm --filter ${info.name} build`, { stdio: 'inherit', env });
+  } else {
+    console.warn(`Package ${info.name} has no test script, skipping...`);
   }
 }

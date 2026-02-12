@@ -32,7 +32,7 @@
 		"test": "clear & vitest",
 		"lint": "oxlint .",
 		"cover": "clear & vitest --coverage",
-		"build": "node ./scripts/rollup.mjs"
+		"build": "rollup --config ../../rollup.config.ts --configPlugin typescript"
 	},
 	"license": "MIT",
 	"devDependencies": {}

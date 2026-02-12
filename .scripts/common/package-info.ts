@@ -43,14 +43,21 @@ export const getPackageGroup = (who: string | undefined) => {
     process.exit(1);
   }
   const packages = workMap.get(who)!;
-  return packages.map((dir) => {
-    const packageJsonPath = join(import.meta.dirname, '..', '..', 'packages', dir, 'package.json');
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-    return {
-      path: packageJsonPath,
-      version: new Version(packageJson.version),
-      json: packageJson,
-      name: packageJson.name as string,
-    };
-  });
+  return packages.map(getPackageInfo);
+};
+
+export const getPackageInfo = (who: string | undefined) => {
+  if (!who) {
+    console.error('No package group specified.');
+    process.exit(1);
+  }
+
+  const packageJsonPath = join(import.meta.dirname, '..', '..', 'packages', who, 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+  return {
+    path: packageJsonPath,
+    version: new Version(packageJson.version),
+    json: packageJson,
+    name: packageJson.name as string,
+  };
 };
