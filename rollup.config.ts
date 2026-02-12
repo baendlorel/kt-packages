@@ -11,14 +11,9 @@ import replace from '@rollup/plugin-replace';
 import dts from 'rollup-plugin-dts';
 
 import { replaceOpts } from './.scripts/replace-options.js';
+import { getRollupAliases } from './.scripts/aliases.js';
 
 // # common options
-
-const tsconfig = './tsconfig.build.json';
-
-const aliasOpts = {
-  entries: [{ find: /^@/, replacement: path.resolve(import.meta.dirname, 'src') }],
-};
 
 // # main options
 
@@ -35,7 +30,7 @@ export default () => [
     ],
 
     plugins: [
-      alias(aliasOpts),
+      alias(getRollupAliases()),
       replace(replaceOpts(process.env.LIB_PACKAGE_PATH)),
       resolve(),
       commonjs(),
@@ -62,6 +57,6 @@ export default () => [
   {
     input: 'src/index.ts',
     output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [alias(aliasOpts), replace(replaceOpts(process.env.LIB_PACKAGE_PATH)), dts()],
+    plugins: [alias(getRollupAliases()), replace(replaceOpts(process.env.LIB_PACKAGE_PATH)), dts()],
   },
 ];
