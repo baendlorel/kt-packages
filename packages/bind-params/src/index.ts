@@ -1,8 +1,9 @@
+import type { Params, Chop } from './global.js';
 import { $define, $max } from './native.js';
 
 /**
  * Creates a new function with bound leading arguments.
- * - preserves `length`.
+ * - preserves `length`, but does not preserve `name`.
  * - preserves `this` context.
  * - if 0 argument are bound, returns the original `fn`.
  * - full type hints are provided.

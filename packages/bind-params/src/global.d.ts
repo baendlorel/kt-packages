@@ -1,14 +1,10 @@
-type Chop<T extends any[], N extends number, Acc extends any[] = []> = Acc['length'] extends N
+export type Chop<T extends any[], N extends number, Acc extends any[] = []> = Acc['length'] extends N
   ? T
   : T extends [infer Head, ...infer Rest]
     ? Chop<Rest, N, [...Acc, Head]>
     : [];
 
-type NParams<
-  Fn extends (...args: any[]) => any,
-  N extends number,
-  Acc extends any[] = [],
-> = Acc['length'] extends N
+type NParams<Fn extends (...args: any[]) => any, N extends number, Acc extends any[] = []> = Acc['length'] extends N
   ? Acc
   : Parameters<Fn> extends readonly [infer First, ...infer Rest]
     ? Rest extends any[]
@@ -30,4 +26,4 @@ type ParamPossibility<
       Result | (Counter['length'] extends 0 ? [] : NParams<Fn, Counter['length']>)
     >;
 
-type Params<Fn extends (...args: any[]) => any> = ParamPossibility<Fn, 17>;
+export type Params<Fn extends (...args: any[]) => any> = ParamPossibility<Fn, 17>;

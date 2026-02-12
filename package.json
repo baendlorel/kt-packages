@@ -9,11 +9,10 @@
 		"lines": "tsx ./.scripts/lines.ts",
 		"build": "pnpm -r --if-present run build",
 		"test": "pnpm -r --if-present run test",
-		"lint": "pnpm -r --if-present run lint",
 		"cover": "pnpm -r --if-present run cover",
 		"build:root": "rollup --config rollup.config.ts --configPlugin typescript",
 		"test:root": "vitest",
-		"lint:root": "oxlint ."
+		"lint": "oxlint ."
 	},
 	"license": "MIT",
 	"devDependencies": {
@@ -25,6 +24,7 @@
 		"@rollup/plugin-typescript": "^12.3.0",
 		"@types/node": "^25.2.3",
 		"@vitest/coverage-v8": "^4.0.18",
+		"oxlint": "^1.47.0",
 		"prettier": "^3.8.1",
 		"rimraf": "^6.1.2",
 		"rollup-plugin-dts": "^6.3.0",
