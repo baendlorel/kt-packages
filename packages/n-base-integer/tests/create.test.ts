@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { NBaseInteger } from '@/index';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
 
 describe('NBaseInteger Creation Tests', () => {
   describe('Factory function (index.ts)', () => {
@@ -43,13 +43,13 @@ describe('NBaseInteger Creation Tests', () => {
     describe('Error cases - Invalid arguments count', () => {
       it('should throw error with no arguments', () => {
         expect(() => (NBaseInteger as any)()).toThrow(
-          'NBaseInteger(n: string, base?: number, charset?: string) requires at least one argument.'
+          'NBaseInteger(n: string, base?: number, charset?: string) requires at least one argument.',
         );
       });
 
       it('should throw error with too many arguments', () => {
         expect(() => (NBaseInteger as any)('123', 10, '0123456789', 'extra')).toThrow(
-          'Too many arguments for NBaseInteger(n: string, base?: number, charset?: string). Expect 1~3, got 4'
+          'Too many arguments for NBaseInteger(n: string, base?: number, charset?: string). Expect 1~3, got 4',
         );
       });
     });
@@ -57,25 +57,25 @@ describe('NBaseInteger Creation Tests', () => {
     describe('Error cases - Invalid string (n)', () => {
       it('should throw error when n is not a string', () => {
         expect(() => (NBaseInteger as any)(123)).toThrow(
-          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be a non-empty string excludes '-'."
+          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be a non-empty string excludes '-'.",
         );
       });
 
       it('should throw error when n is empty string', () => {
         expect(() => NBaseInteger('')).toThrow(
-          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'."
+          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'.",
         );
       });
 
       it('should throw error when n is only whitespace', () => {
         expect(() => NBaseInteger('   ')).toThrow(
-          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'."
+          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'.",
         );
       });
 
       it('should throw error when n is only minus sign', () => {
         expect(() => NBaseInteger('-')).toThrow(
-          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'."
+          "NBaseInteger(n: string, base?: number, charset?: string) requires 'n' to be non-empty and not '-'.",
         );
       });
     });
@@ -94,18 +94,14 @@ describe('NBaseInteger Creation Tests', () => {
       });
 
       it('should throw error when base is not a safe integer', () => {
-        expect(() => NBaseInteger('123', Number.MAX_SAFE_INTEGER + 1)).toThrow(
-          "'base' must be a 2 ~ 1000000 integer."
-        );
+        expect(() => NBaseInteger('123', Number.MAX_SAFE_INTEGER + 1)).toThrow("'base' must be a 2 ~ 1000000 integer.");
       });
     });
 
     describe('Error cases - Base exceeds default charset', () => {
       it('should throw error when base exceeds default charset length', () => {
         // Default charset has 62 characters (0-9A-Za-z)
-        expect(() => NBaseInteger('123', 63)).toThrow(
-          'Base 63 exceeds the length of the default charset (62).'
-        );
+        expect(() => NBaseInteger('123', 63)).toThrow('Base 63 exceeds the length of the default charset (62).');
       });
     });
 
@@ -116,26 +112,22 @@ describe('NBaseInteger Creation Tests', () => {
 
       it('should throw error when charset has duplicate characters', () => {
         expect(() => NBaseInteger('123', 4, '0123')).not.toThrow(); // valid
-        expect(() => NBaseInteger('123', 4, '0112')).toThrow(
-          "'charset' must exclude duplicate chars."
-        );
+        expect(() => NBaseInteger('123', 4, '0112')).toThrow("'charset' must exclude duplicate chars.");
       });
 
       it('should throw error when charset contains control characters', () => {
-        expect(() => NBaseInteger('123', 4, '01\x002')).toThrow(
-          "'charset' must exclude control characters."
-        );
+        expect(() => NBaseInteger('123', 4, '01\x002')).toThrow("'charset' must exclude control characters.");
       });
 
       it('should throw error when charset contains dot', () => {
         expect(() => NBaseInteger('123', 4, '01.2')).toThrow(
-          "'charset' must exclude '.'. Might be confused with demical point."
+          "'charset' must exclude '.'. Might be confused with demical point.",
         );
       });
 
       it('should throw error when charset contains dash', () => {
         expect(() => NBaseInteger('123', 4, '01-2')).toThrow(
-          "'charset' must exclude '-'. Might be confused with negative sign."
+          "'charset' must exclude '-'. Might be confused with negative sign.",
         );
       });
 
@@ -146,9 +138,7 @@ describe('NBaseInteger Creation Tests', () => {
       // ? 为什么单独运行没有问题，一起运行通不过？
       // * 原来是因为缓存charset中的length<base判定，不等号方向写反了
       it('should throw error when charset is shorter than base', () => {
-        expect(() => NBaseInteger('123', 5, '0123')).toThrow(
-          'charset.length must >= base, but 4 < 5.'
-        );
+        expect(() => NBaseInteger('123', 5, '0123')).toThrow('charset.length must >= base, but 4 < 5.');
       });
     });
   });
@@ -183,26 +173,22 @@ describe('NBaseInteger Creation Tests', () => {
     describe('Error cases', () => {
       it('should throw error when n is not a safe integer', () => {
         expect(() => NBaseInteger.from(Number.MAX_SAFE_INTEGER + 1, 10)).toThrow(
-          'The method is not called with a safe integer, got 9007199254740992.'
+          'The method is not called with a safe integer, got 9007199254740992.',
         );
       });
 
       it('should throw error when n is NaN', () => {
-        expect(() => NBaseInteger.from(NaN, 10)).toThrow(
-          'The method is not called with a safe integer, got NaN.'
-        );
+        expect(() => NBaseInteger.from(NaN, 10)).toThrow('The method is not called with a safe integer, got NaN.');
       });
 
       it('should throw error when n is Infinity', () => {
         expect(() => NBaseInteger.from(Infinity, 10)).toThrow(
-          'The method is not called with a safe integer, got Infinity.'
+          'The method is not called with a safe integer, got Infinity.',
         );
       });
 
       it('should throw error when n is a float', () => {
-        expect(() => NBaseInteger.from(12.5, 10)).toThrow(
-          'The method is not called with a safe integer, got 12.5.'
-        );
+        expect(() => NBaseInteger.from(12.5, 10)).toThrow('The method is not called with a safe integer, got 12.5.');
       });
 
       it('should throw error when base is invalid', () => {
@@ -250,32 +236,28 @@ describe('NBaseInteger Creation Tests', () => {
 
     describe('Error cases', () => {
       it('should throw error when n is not an array', () => {
-        expect(() => (NBaseInteger.fromDigits as any)('123', 10)).toThrow(
-          "'n' must be an array of digits."
-        );
+        expect(() => (NBaseInteger.fromDigits as any)('123', 10)).toThrow("'n' must be an array of digits.");
       });
 
       it('should throw error when negative is not a boolean', () => {
         expect(() => (NBaseInteger.fromDigits as any)([1, 2, 3], 10, 'true')).toThrow(
-          "'negative' must be a bool or omitted."
+          "'negative' must be a bool or omitted.",
         );
       });
 
       it('should throw error when base is invalid', () => {
-        expect(() => NBaseInteger.fromDigits([1, 2, 3], 1)).toThrow(
-          "'base' must be a 2 ~ 1000000 integer."
-        );
+        expect(() => NBaseInteger.fromDigits([1, 2, 3], 1)).toThrow("'base' must be a 2 ~ 1000000 integer.");
       });
 
       it('should throw error when digit is not a safe integer', () => {
         expect(() => NBaseInteger.fromDigits([1, 2.5, 3], 10)).toThrow(
-          'The method is not called with a safe integer, got 2.5.'
+          'The method is not called with a safe integer, got 2.5.',
         );
       });
 
       it('should throw error when digit is NaN', () => {
         expect(() => NBaseInteger.fromDigits([1, NaN, 3], 10)).toThrow(
-          'The method is not called with a safe integer, got NaN.'
+          'The method is not called with a safe integer, got NaN.',
         );
       });
 

@@ -1,5 +1,6 @@
-import { describe, it, expect } from '@jest/globals';
-import { NBaseInteger } from '@/index';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
+
 describe('NBaseInteger 链式四则混合运算', () => {
   it('加减乘除链式调用', () => {
     const a = NBaseInteger.from(100, 10);

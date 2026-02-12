@@ -1,14 +1,11 @@
-import { Flag } from './consts';
+import { Flag } from './consts.js';
 
 /**
  * Throws an error if the provided flag does not match the internal flag.
  * @param privateFlag The flag to check.
  * @param msg The error message to throw if the flag does not match.
  */
-export const expectPrivateCalling = (
-  privateFlag: symbol,
-  msg = `This method is prohibited from calling outside.`
-) => {
+export const expectPrivateCalling = (privateFlag: symbol, msg = `This method is prohibited from calling outside.`) => {
   if (privateFlag !== Flag.PRIVATE) {
     throw new Error(msg);
   }

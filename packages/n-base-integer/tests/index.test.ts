@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { NBaseInteger } from '@/index';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
 // Test for NBaseInteger and toString
 
 describe('NBaseInteger', () => {
@@ -45,12 +45,8 @@ describe('NBaseInteger', () => {
     const big = '1234567890123456789012345678901234567890';
     expect(NBaseInteger(big, 10).toString()).toBe(big);
     expect(NBaseInteger('-' + big, 10).toString()).toBe('-' + big);
-    expect(NBaseInteger.from(Number.MAX_SAFE_INTEGER, 10).toString()).toBe(
-      Number.MAX_SAFE_INTEGER.toString()
-    );
-    expect(NBaseInteger.from(Number.MIN_SAFE_INTEGER, 10).toString()).toBe(
-      Number.MIN_SAFE_INTEGER.toString()
-    );
+    expect(NBaseInteger.from(Number.MAX_SAFE_INTEGER, 10).toString()).toBe(Number.MAX_SAFE_INTEGER.toString());
+    expect(NBaseInteger.from(Number.MIN_SAFE_INTEGER, 10).toString()).toBe(Number.MIN_SAFE_INTEGER.toString());
   });
 
   it('should support max base and min base', () => {
@@ -78,14 +74,10 @@ describe('NBaseInteger', () => {
   });
 
   it('should throw on invalid input types', () => {
-    // @ts-expect-error
-    expect(() => NBaseInteger.from({}, 10)).toThrow();
-    // @ts-expect-error
-    expect(() => NBaseInteger.from([], 10)).toThrow();
-    // @ts-expect-error
-    expect(() => NBaseInteger.from(null, 10)).toThrow();
-    // @ts-expect-error
-    expect(() => NBaseInteger.from(undefined, 10)).toThrow();
+    expect(() => NBaseInteger.from({} as any, 10)).toThrow();
+    expect(() => NBaseInteger.from([] as any, 10)).toThrow();
+    expect(() => NBaseInteger.from(null as any, 10)).toThrow();
+    expect(() => NBaseInteger.from(undefined as any, 10)).toThrow();
   });
 
   it('should throw if base and charset mismatch', () => {

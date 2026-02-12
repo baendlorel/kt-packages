@@ -1,6 +1,5 @@
-import { describe, it, expect, xit } from '@jest/globals';
-import { NBaseInteger } from '@/index';
-// import { powMontgomeryLadder } from '@/n-base/large-handler';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
 
 describe('NBaseInteger hardcore add/mul', () => {
   const customCharset = 'abc'; // base 3

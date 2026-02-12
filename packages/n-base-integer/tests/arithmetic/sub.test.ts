@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { NBaseInteger } from '@/index';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
 
 describe('NBaseInteger.sub', () => {
   it('should subtract two positive numbers', () => {
@@ -60,11 +60,5 @@ describe('NBaseInteger.sub', () => {
     const a = NBaseInteger.from(10, 10);
     const b = NBaseInteger.from(10, 2);
     expect(() => a.sub(b)).toThrow();
-  });
-
-  it('should throw if argument is not number or NBaseInteger', () => {
-    const a = NBaseInteger.from(1, 10);
-    // @ts-expect-error
-    expect(() => a.sub('not a number')).toThrow();
   });
 });

@@ -1,9 +1,8 @@
-import { CLASS_NAME, Flag } from './n-base/consts';
-import { chs } from './n-base/common';
-import { safeBase, safeCharset } from './n-base/safe';
-import { NBaseInteger as NBI } from './n-base/integer';
+import { CLASS_NAME, Flag } from './n-base/consts.js';
+import { chs } from './n-base/common.js';
+import { safeBase, safeCharset } from './n-base/safe.js';
+import { NBaseInteger as NBI } from './n-base/integer.js';
 
-// 现在 TypeScript 可以正确推断 nsbc 的类型
 const create = NBI[Flag.FACTORY](Flag.PRIVATE);
 
 const DEF = `${CLASS_NAME}(n: string, base?: number, charset?: string)`;

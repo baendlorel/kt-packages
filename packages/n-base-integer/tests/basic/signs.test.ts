@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { NBaseInteger } from '@/index';
+import { describe, it, expect } from 'vitest';
+import { NBaseInteger } from '@n-base-integer/index.js';
 
 describe('NBaseInteger signs', () => {
   const base = 10;

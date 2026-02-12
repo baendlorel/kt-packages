@@ -1,4 +1,4 @@
-import { MAX_BASE } from './consts';
+import { MAX_BASE } from './consts.js';
 
 const charsetCache = new Map<string, string[]>();
 

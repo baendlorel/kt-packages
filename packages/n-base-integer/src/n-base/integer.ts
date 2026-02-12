@@ -1,7 +1,7 @@
-import { MAX_BASE, CLASS_NAME, Flag } from './consts';
-import { chs, unshift0 } from './common';
-import { expect, expectPrivateCalling } from './expect';
-import { safeBase, safeCharset, safeInt } from './safe';
+import { MAX_BASE, CLASS_NAME, Flag } from './consts.js';
+import { chs, unshift0 } from './common.js';
+import { expect, expectPrivateCalling } from './expect.js';
+import { safeBase, safeCharset, safeInt } from './safe.js';
 
 interface NBaseIntegerDivResult {
   quotient: NBaseInteger;
@@ -45,9 +45,7 @@ const parse = (n: string, base: number, charset: readonly string[]): number[] =>
     const digit = map[narr[i]];
     // Cannot use `!digit` for it might be `!0`
     if (digit === undefined) {
-      throw new Error(
-        `Parsing failed, unknown char '${narr[i]}' in '${n}' with charset = ${charset.join()}.`
-      );
+      throw new Error(`Parsing failed, unknown char '${narr[i]}' in '${n}' with charset = ${charset.join()}.`);
     }
     digits.push(digit);
   }
@@ -221,9 +219,7 @@ const divide = (a: readonly number[], b: readonly number[], base: number): Primi
   let carry = [0];
   do {
     // one digit at a time
-    const dividend = isZero(carry)
-      ? aa.splice(aa.length - 1, 1)
-      : aa.splice(aa.length - 1, 1).concat(carry);
+    const dividend = isZero(carry) ? aa.splice(aa.length - 1, 1) : aa.splice(aa.length - 1, 1).concat(carry);
 
     // start from high rank
     switch (cmp(dividend, b)) {
@@ -290,7 +286,7 @@ const divideSmall = (a: readonly number[], b: number, base: number): PrimitiveDi
 const binarySearchQuotient = (
   a: readonly number[],
   b: readonly number[],
-  base: number
+  base: number,
 ): { quotient: number; remainder: number[] } => {
   // & we should always have prev >= cur
   let lower = 1;
@@ -594,7 +590,7 @@ export class NBaseInteger {
   constructor(priv: symbol, n: number, base: number) {
     expectPrivateCalling(
       priv,
-      `The constructor of ${CLASS_NAME} is protected, please use ${CLASS_NAME}(...args) instead.`
+      `The constructor of ${CLASS_NAME} is protected, please use ${CLASS_NAME}(...args) instead.`,
     );
 
     // assign essential properties
@@ -1320,9 +1316,7 @@ export class NBaseInteger {
     const maxSafeInt = maxSafeIntegerInBase(this.#base);
     switch (cmp(this.#digits, maxSafeInt)) {
       case Ordering.Greater:
-        throw new RangeError(
-          `This number is too large(> Number.MAX_SAFE_INTEGER). Please use toBigInt() instead.`
-        );
+        throw new RangeError(`This number is too large(> Number.MAX_SAFE_INTEGER). Please use toBigInt() instead.`);
       case Ordering.Equal:
         return Number.MAX_SAFE_INTEGER;
       case Ordering.Less: {
@@ -1411,7 +1405,7 @@ export class NBaseInteger {
   }
 
   [Symbol.toPrimitive](
-    hint: 'number' | 'string' | 'default'
+    hint: 'number' | 'string' | 'default',
   ): { number: number; string: string; default: string }[typeof hint] {
     return hint === 'number' ? this.toNumber() : this.toString();
   }
