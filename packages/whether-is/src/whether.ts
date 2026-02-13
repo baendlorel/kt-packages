@@ -1,21 +1,20 @@
+import type { Class, Func } from './global.js';
 import { deepEqual } from './deep-equal.js';
 import { getAllKeys } from './get-all-keys.js';
 import {
-  ObjectIs,
+  $is,
   ObjectPrototype,
-  ReflectOwnKeys,
-  ReflectGet,
-  ReflectGetPrototypeOf,
-  ArrayIsArray,
-  NumberIsNaN,
-  NumberIsInteger,
-  NumberIsSafeInteger,
-  NumberIsFinite,
-  NumberMaxSafeInteger,
-  NumberMinSafeInteger,
-  FunctionPrototypeToString,
-  SymbolIterator,
-  BooleanConstructor,
+  $ownKeys,
+  $get,
+  $getPrototypeOf,
+  $isArray,
+  $isNaN,
+  $isInt,
+  $isSafeInt,
+  $isFinite,
+  $MAX_INT,
+  $MIN_INT,
+  $fnToString,
 } from './global-methods.js';
 
 const NOT_GIVEN = Symbol('NOT_GIVEN');
@@ -30,7 +29,7 @@ export class UntypedWhether extends Function {
    * Same as `Object.is`
    */
   is(a: any, b: any): boolean {
-    return ObjectIs(a, b);
+    return $is(a, b);
   }
 
   /**
@@ -47,7 +46,7 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isTruthy(o: any): boolean {
-    return BooleanConstructor(o);
+    return Boolean(o);
   }
 
   /**
@@ -67,12 +66,12 @@ export class UntypedWhether extends Function {
       return true;
     }
 
-    if (ArrayIsArray(o)) {
+    if ($isArray(o)) {
       return o.length === 0;
     }
 
     if (typeof o === 'object') {
-      return ReflectOwnKeys(o).length === 0;
+      return $ownKeys(o).length === 0;
     }
 
     return false;
@@ -86,7 +85,7 @@ export class UntypedWhether extends Function {
     if (typeof o !== 'object') {
       return null;
     }
-    return ReflectOwnKeys(o).length === 0;
+    return $ownKeys(o).length === 0;
   }
 
   /**
@@ -94,7 +93,7 @@ export class UntypedWhether extends Function {
    * - return `null` if the target is not an object
    */
   isEmptyArray(o: any): boolean | null {
-    if (!ArrayIsArray(o)) {
+    if (!$isArray(o)) {
       return null;
     }
     return o.length === 0;
@@ -105,7 +104,7 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isNegativeZero(o: any): boolean {
-    return ObjectIs(o, -0);
+    return $is(o, -0);
   }
 
   /**
@@ -113,7 +112,7 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isPositiveZero(o: any): boolean {
-    return ObjectIs(o, +0);
+    return $is(o, +0);
   }
 
   /**
@@ -133,7 +132,7 @@ export class UntypedWhether extends Function {
     }
 
     let example;
-    if (ObjectIs(protoClass, Promise)) {
+    if ($is(protoClass, Promise)) {
       example = new protoClass(() => ({}));
     } else {
       example = new protoClass();
@@ -150,7 +149,7 @@ export class UntypedWhether extends Function {
       if (!targetProtoKeys.has(k)) {
         return false;
       }
-      if (typeof ReflectGet(o, k) !== typeof example[k]) {
+      if (typeof $get(o, k) !== typeof example[k]) {
         return false;
       }
     }
@@ -238,7 +237,7 @@ export class UntypedWhether extends Function {
     if (o === null || o === undefined) {
       return false;
     }
-    return typeof o[SymbolIterator] === 'function';
+    return typeof o[Symbol.iterator] === 'function';
   }
 
   /**
@@ -249,7 +248,7 @@ export class UntypedWhether extends Function {
     if (!this.isObject(o)) {
       return false;
     }
-    const proto = ReflectGetPrototypeOf(o);
+    const proto = $getPrototypeOf(o);
     return proto === ObjectPrototype || proto === null;
   }
 
@@ -416,7 +415,7 @@ export class UntypedWhether extends Function {
       return null;
     }
 
-    return NumberIsNaN(o);
+    return $isNaN(o);
   }
 
   /**
@@ -424,7 +423,7 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isInteger(o: any): boolean {
-    return NumberIsInteger(o);
+    return $isInt(o);
   }
 
   /**
@@ -432,7 +431,7 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isSafeInteger(o: any): boolean {
-    return NumberIsSafeInteger(o);
+    return $isSafeInt(o);
   }
 
   /**
@@ -440,11 +439,11 @@ export class UntypedWhether extends Function {
    * @param o target
    */
   isSafeNumber(o: any): boolean {
-    return typeof o === 'number' && o <= NumberMaxSafeInteger && o >= NumberMinSafeInteger;
+    return typeof o === 'number' && o <= $MAX_INT && o >= $MIN_INT;
   }
 
   isFinite(o: any): boolean {
-    return NumberIsFinite(o);
+    return $isFinite(o);
   }
 
   /**
@@ -462,7 +461,7 @@ export class UntypedWhether extends Function {
     try {
       const psudo = new Proxy(o, { construct: () => ({}) });
       new psudo();
-      const str = FunctionPrototypeToString.call(o) as string;
+      const str = $fnToString.call(o) as string;
       const trimmed = str.replace(/\s/g, '');
       return trimmed.startsWith('class') || trimmed.startsWith('[class');
     } catch {
@@ -480,15 +479,12 @@ export class UntypedWhether extends Function {
    * @param predicate function to validate each element
    * @param msg
    */
-  isArray<T = any>(
-    o: any,
-    predicate: (value?: T, index?: number, array?: T[]) => string | boolean = NOT_GIVEN as any
-  ): o is T[] {
-    if (!ArrayIsArray(o)) {
+  isArray<T = any>(o: any, predicate?: (value?: T, index?: number, array?: T[]) => string | boolean): o is T[] {
+    if (!$isArray(o)) {
       return false;
     }
 
-    if (ObjectIs(predicate, NOT_GIVEN)) {
+    if (!predicate) {
       return true;
     }
 
@@ -686,7 +682,7 @@ export class UntypedWhether extends Function {
    */
   orArray<T = any>(
     o: any,
-    predicate: (value?: T, index?: number, array?: T[]) => string | boolean = NOT_GIVEN as any
+    predicate: (value?: T, index?: number, array?: T[]) => string | boolean = NOT_GIVEN as any,
   ): o is T[] | undefined {
     return o === undefined || this.isArray(o, predicate);
   }

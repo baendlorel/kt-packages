@@ -1,5 +1,6 @@
+import type { Class } from './global.js';
 import { getAllKeys } from './get-all-keys.js';
-import { ObjectIs, ArrayIsArray } from './global-methods.js';
+import { $is, $isArray } from './global-methods.js';
 
 type Like = <T extends Class>(protoClass: T, o: any) => o is InstanceType<T>;
 
@@ -14,7 +15,7 @@ export function deepEqual(a: any, b: any, likeInstanceOf: Like): boolean {
   if (typeof a !== typeof b) {
     return false;
   }
-  if (ObjectIs(a, b)) {
+  if ($is(a, b)) {
     return true;
   } else if (typeof a !== 'object') {
     // rest of the types can be compared directly
@@ -38,7 +39,7 @@ export function deepEqual(a: any, b: any, likeInstanceOf: Like): boolean {
     return a.source === b.source && a.flags === b.flags;
   }
   // Array
-  if (ArrayIsArray(a) && ArrayIsArray(b)) {
+  if ($isArray(a) && $isArray(b)) {
     if (a.length !== b.length) {
       return false;
     }

@@ -1,5 +1,6 @@
-import { UntypedWhether } from './whether';
-const NOT_GIVEN = Symbol('NOT_GIVEN');
+import type { Func, Class } from './global.js';
+import { UntypedWhether } from './whether.js';
+
 class _ extends UntypedWhether {
   orNegativeZero(o: any): boolean {
     return o === undefined || this.isNegativeZero(o);
@@ -111,7 +112,7 @@ class _ extends UntypedWhether {
 
   orArray<T = any>(
     o: any,
-    predicate: (value?: T, index?: number, array?: T[]) => string | boolean = NOT_GIVEN as any
+    predicate?: (value?: T, index?: number, array?: T[]) => string | boolean,
   ): o is T[] | undefined {
     return o === undefined || this.isArray(o, predicate);
   }
