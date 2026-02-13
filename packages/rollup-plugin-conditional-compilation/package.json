@@ -1,0 +1,41 @@
+{
+	"name": "rollup-plugin-conditional-compilation",
+	"version": "1.0.6",
+	"author": {
+		"name": "Kasukabe Tsumugi",
+		"email": "futami16237@gmail.com"
+	},
+	"description": "Conditional Compilation macros like #if #endif in C++.",
+	"description_zh": "和C++类似的条件编译语法，使用#if #endif等指令",
+	"purpose": "rollup-plugin",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.cjs",
+		"default": "./dist/index.mjs"
+	},
+	"files": [
+		"dist"
+	],
+	"homepage": "https://github.com/baendlorel/rollup-plugin-conditional-compilation#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/baendlorel/rollup-plugin-conditional-compilation"
+	},
+	"keywords": [
+		"conditional",
+		"compilation",
+		"plugin",
+		"rollup",
+		"typescript",
+		"javascript"
+	],
+	"license": "MIT",
+	"dependencies": {
+		"acorn": "^8.15.0"
+	}
+}
