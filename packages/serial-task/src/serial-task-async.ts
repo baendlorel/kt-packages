@@ -68,7 +68,9 @@ export function createSerialTaskAsync<F extends Fn>(opts: SerialTaskOptions<F>):
     return { value: last, results, trivial: false, breakAt, skipped };
   };
 
-  defineProperty(fn, 'name', { value: name, configurable: true });
+  if (name) {
+    defineProperty(fn, 'name', { value: name, configurable: true });
+  }
   defineProperty(fn, 'length', { value: tasks[0].length, configurable: true });
   return fn;
 }

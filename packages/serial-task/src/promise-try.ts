@@ -1,5 +1,5 @@
 import { Fn } from './global.js';
-import { isThenable, PromiseReject, PromiseResolve } from './common.js';
+import { isThenable } from './common.js';
 
 type PromiseReturn<F extends Fn, T = ReturnType<F>> = Promise<T extends Promise<unknown> ? Awaited<T> : T>;
 
@@ -9,10 +9,10 @@ export function PromiseTry(fn: Fn, thisArg: unknown, ...args: Parameters<Fn>): P
     if (isThenable(r)) {
       return r;
     } else {
-      return PromiseResolve(r);
+      return Promise.resolve(r);
     }
   } catch (e) {
-    return PromiseReject(e);
+    return Promise.reject(e);
   }
 }
 
@@ -22,9 +22,9 @@ export function PromiseTrapply(fn: Fn, thisArg: unknown, args: Parameters<Fn>): 
     if (isThenable(r)) {
       return r;
     } else {
-      return PromiseResolve(r);
+      return Promise.resolve(r);
     }
   } catch (e) {
-    return PromiseReject(e);
+    return Promise.reject(e);
   }
 }
