@@ -363,7 +363,7 @@ describe('ReflectDeep 深度反射测试', () => {
     it('应该获取对象自身的所有键', () => {
       const sym = Symbol('test');
       const obj = { a: 1, b: 2, [sym]: 'symbol' };
-      const keys = ReflectDeep.keys(obj);
+      const keys = ReflectDeep.ownKeys(obj);
 
       expect(keys).toContain('a');
       expect(keys).toContain('b');
@@ -383,7 +383,7 @@ describe('ReflectDeep 深度反射测试', () => {
       Child.prototype.childProp = 'child';
 
       const obj = new (Child as any)();
-      const keys = ReflectDeep.keys(obj);
+      const keys = ReflectDeep.ownKeys(obj);
 
       expect(keys).toContain('ownProp');
       expect(keys).toContain('childProp');
@@ -394,7 +394,7 @@ describe('ReflectDeep 深度反射测试', () => {
 
     it('应该处理数组对象', () => {
       const arr = [1, 2, 3];
-      const keys = ReflectDeep.keys(arr);
+      const keys = ReflectDeep.ownKeys(arr);
 
       expect(keys).toContain('0');
       expect(keys).toContain('1');
@@ -408,7 +408,7 @@ describe('ReflectDeep 深度反射测试', () => {
 
     it('应该处理空对象', () => {
       const obj = {};
-      const keys = ReflectDeep.keys(obj);
+      const keys = ReflectDeep.ownKeys(obj);
 
       // 空对象应该包含 Object.prototype 上的方法
       expect(keys).toContain('toString');
@@ -426,17 +426,17 @@ describe('ReflectDeep 深度反射测试', () => {
         configurable: true,
       });
 
-      const keys = ReflectDeep.keys(obj);
+      const keys = ReflectDeep.ownKeys(obj);
 
       expect(keys).toContain('visible');
       expect(keys).toContain('hidden'); // keys() 应该包含不可枚举属性
     });
 
     it('应该在参数无效时抛出错误', () => {
-      expect(() => ReflectDeep.keys(null as any)).toThrow(TypeError);
-      expect(() => ReflectDeep.keys(undefined as any)).toThrow(TypeError);
-      expect(() => ReflectDeep.keys('string' as any)).toThrow(TypeError);
-      expect(() => ReflectDeep.keys(123 as any)).toThrow(TypeError);
+      expect(() => ReflectDeep.ownKeys(null as any)).toThrow(TypeError);
+      expect(() => ReflectDeep.ownKeys(undefined as any)).toThrow(TypeError);
+      expect(() => ReflectDeep.ownKeys('string' as any)).toThrow(TypeError);
+      expect(() => ReflectDeep.ownKeys(123 as any)).toThrow(TypeError);
     });
   });
 

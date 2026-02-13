@@ -56,7 +56,7 @@ ReflectDeep.reach(obj, ['a', 'b', 2, 'x']); // { value: { c: 3 }, index: 2, reac
 const cloned = ReflectDeep.clone(obj);
 
 // Property key extraction
-const allKeys = ReflectDeep.keys(obj); // All keys from prototype chain
+const allKeys = ReflectDeep.ownKeys(obj); // All keys from prototype chain
 const grouped = ReflectDeep.groupedKeys(obj); // Keys grouped by prototype layer
 ```
 
@@ -188,7 +188,7 @@ ReflectDeep.defineProperty(obj, ['x', 'y'], {
 });
 ```
 
-### keys(target)
+### ownKeys(target)
 
 Gets all property keys (including symbols) from the target object and its prototype chain as a flattened array.
 
@@ -196,7 +196,7 @@ Gets all property keys (including symbols) from the target object and its protot
 
 ```typescript
 const obj = { own: 'property', [Symbol('sym')]: 'symbol' };
-const allKeys = ReflectDeep.keys(obj);
+const allKeys = ReflectDeep.ownKeys(obj);
 // Returns: ['own', Symbol(sym), 'toString', 'valueOf', ...]
 
 // Works with custom prototypes
@@ -204,7 +204,7 @@ function Parent() {}
 Parent.prototype.parentProp = 'parent';
 const child = Object.create(Parent.prototype);
 child.childProp = 'child';
-const keys = ReflectDeep.keys(child);
+const keys = ReflectDeep.ownKeys(child);
 // ['childProp', 'parentProp', 'toString', ...]
 ```
 
@@ -274,7 +274,7 @@ Dog.prototype.bark = function () {
 const myDog = new Dog('Rex', 'German Shepherd');
 
 // Get all keys from entire prototype chain
-const allKeys = ReflectDeep.keys(myDog);
+const allKeys = ReflectDeep.ownKeys(myDog);
 // ['name', 'breed', 'bark', 'speak', 'constructor', 'toString', ...]
 
 // Get keys grouped by prototype layer
@@ -304,13 +304,7 @@ const theme = ReflectDeep.get(complex, ['users', 0, 'profile', 'settings', 'them
 ReflectDeep.set(complex, ['users', 0, 'profile', 'settings', 'notifications'], true);
 
 // Check if nested property exists
-const hasNotifications = ReflectDeep.has(complex, [
-  'users',
-  0,
-  'profile',
-  'settings',
-  'notifications',
-]);
+const hasNotifications = ReflectDeep.has(complex, ['users', 0, 'profile', 'settings', 'notifications']);
 ```
 
 ## Performance Considerations

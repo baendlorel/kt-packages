@@ -278,7 +278,7 @@ export namespace ReflectDeep {
    * child.childProp = 'child';
    * ReflectDeep.keys(child); // ['childProp', 'parentProp', 'toString', ...]
    */
-  export const keys = <T extends object>(target: T): (string | symbol)[] => {
+  export const ownKeys = <T extends object>(target: T): (string | symbol)[] => {
     expectTarget('keys', target);
 
     const keySet = new Set($ownKeys(target));
