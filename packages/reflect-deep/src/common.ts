@@ -1,3 +1,5 @@
+import { $isArray } from './native.js';
+
 // # utils
 export function isPrimitive(o: unknown) {
   return (typeof o !== 'object' || o === null) && typeof o !== 'function';
@@ -13,7 +15,7 @@ export function expectTargetAndKeys(fnName: string, o: unknown, keys: PropertyKe
   if (isPrimitive(o)) {
     $throw(`${fnName} called with non-object target: ${o}`);
   }
-  if (!Array.isArray(keys)) {
+  if (!$isArray(keys)) {
     $throw(`${fnName} called with non-array keys`);
   }
   if (keys.length === 0) {

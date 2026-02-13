@@ -150,177 +150,6 @@ describe('ReflectDeep 深度反射测试', () => {
     });
   });
 
-  describe('clone() toString深拷贝测试', () => {
-    it('clone() toPrimitive深拷贝测试', () => {
-      expect(ReflectDeep.clone(null)).toBe(null);
-      expect(ReflectDeep.clone(undefined)).toBe(undefined);
-      expect(ReflectDeep.clone(42)).toBe(42);
-      expect(ReflectDeep.clone('hello')).toBe('hello');
-      expect(ReflectDeep.clone(true)).toBe(true);
-      expect(ReflectDeep.clone(Symbol.for('test'))).toBe(Symbol.for('test'));
-    });
-
-    it('应该克隆简单对象', () => {
-      const obj = { a: 1, b: 'test', c: true };
-      const cloned = ReflectDeep.clone(obj);
-
-      expect(cloned).toEqual(obj);
-      expect(cloned).not.toBe(obj);
-
-      cloned.a = 999;
-      expect(obj.a).toBe(1);
-    });
-
-    it('应该克隆嵌套对象', () => {
-      const obj = { a: { b: { c: { d: 'deep' } } } };
-      const cloned = ReflectDeep.clone(obj);
-
-      expect(cloned).toEqual(obj);
-      expect(cloned.a).not.toBe(obj.a);
-      expect(cloned.a.b).not.toBe(obj.a.b);
-
-      cloned.a.b.c.d = 'modified';
-      expect(obj.a.b.c.d).toBe('deep');
-    });
-
-    it('应该克隆数组', () => {
-      const arr = [1, [2, [3, 4]], { a: 5 }] as any;
-      const cloned = ReflectDeep.clone(arr);
-
-      expect(cloned).toEqual(arr);
-      expect(cloned).not.toBe(arr);
-      expect(cloned[1]).not.toBe(arr[1]);
-      expect(cloned[2]).not.toBe(arr[2]);
-
-      cloned[1][1][0] = 999;
-      expect(arr[1][1][0]).toBe(3);
-    });
-
-    it('应该克隆 Date 对象', () => {
-      const date = new Date('2023-01-01');
-      const cloned = ReflectDeep.clone(date);
-
-      expect(cloned).toEqual(date);
-      expect(cloned).not.toBe(date);
-      expect(cloned instanceof Date).toBe(true);
-    });
-
-    it('应该克隆 RegExp 对象', () => {
-      const regex = /test/gim;
-      const cloned = ReflectDeep.clone(regex);
-
-      expect(cloned).toEqual(regex);
-      expect(cloned).not.toBe(regex);
-      expect(cloned instanceof RegExp).toBe(true);
-      expect(cloned.source).toBe('test');
-      expect(cloned.flags).toBe('gim');
-    });
-
-    it('应该克隆 Map 对象', () => {
-      const map = new Map<any, any>([
-        ['key1', 'value1'],
-        [{ nested: true }, { data: 'test' }],
-      ]);
-      const cloned = ReflectDeep.clone(map);
-
-      expect(cloned).not.toBe(map);
-      expect(cloned instanceof Map).toBe(true);
-      expect(cloned.size).toBe(2);
-      expect(cloned.get('key1')).toBe('value1');
-
-      // 修改克隆不应影响原对象
-      cloned.set('key1', 'modified');
-      expect(map.get('key1')).toBe('value1');
-    });
-
-    it('应该克隆 Set 对象', () => {
-      const set = new Set([1, 'test', { nested: true }]);
-      const cloned = ReflectDeep.clone(set);
-
-      expect(cloned).not.toBe(set);
-      expect(cloned instanceof Set).toBe(true);
-      expect(cloned.size).toBe(3);
-      expect(cloned.has(1)).toBe(true);
-      expect(cloned.has('test')).toBe(true);
-    });
-
-    it('应该处理循环引用', () => {
-      const obj: any = { name: 'circular' };
-      obj.self = obj;
-      obj.nested = { parent: obj };
-
-      const cloned = ReflectDeep.clone(obj);
-
-      expect(cloned).not.toBe(obj);
-      expect(cloned.self).toBe(cloned);
-      expect(cloned.nested.parent).toBe(cloned);
-      expect(cloned.name).toBe('circular');
-    });
-
-    it('应该克隆装箱基本类型', () => {
-      const numObj = new Number(42);
-      const strObj = new String('test');
-      const boolObj = new Boolean(true);
-
-      const clonedNum = ReflectDeep.clone(numObj);
-      const clonedStr = ReflectDeep.clone(strObj);
-      const clonedBool = ReflectDeep.clone(boolObj);
-
-      expect(clonedNum).not.toBe(numObj);
-      expect(clonedNum.valueOf()).toBe(42);
-      expect(clonedStr.valueOf()).toBe('test');
-      expect(clonedBool.valueOf()).toBe(true);
-    });
-
-    it('应该克隆 TypedArray', () => {
-      const int8 = new Int8Array([1, 2, 3]);
-      const float32 = new Float32Array([1.1, 2.2, 3.3]);
-
-      const clonedInt8 = ReflectDeep.clone(int8);
-      const clonedFloat32 = ReflectDeep.clone(float32);
-
-      expect(clonedInt8).not.toBe(int8);
-      expect(clonedInt8).toEqual(int8);
-      expect(clonedFloat32).not.toBe(float32);
-      expect(clonedFloat32).toEqual(float32);
-    });
-
-    it('应该克隆 ArrayBuffer', () => {
-      const buffer = new ArrayBuffer(8);
-      const view = new Uint8Array(buffer);
-      view[0] = 42;
-
-      const cloned = ReflectDeep.clone(buffer);
-      const clonedView = new Uint8Array(cloned);
-
-      expect(cloned).not.toBe(buffer);
-      expect(clonedView[0]).toBe(42);
-    });
-
-    it('应该克隆 DataView', () => {
-      const buffer = new ArrayBuffer(16);
-      const dataView = new DataView(buffer, 4, 8);
-      dataView.setInt32(0, 42);
-
-      const cloned = ReflectDeep.clone(dataView);
-
-      expect(cloned).not.toBe(dataView);
-      expect(cloned instanceof DataView).toBe(true);
-      expect(cloned.getInt32(0)).toBe(42);
-    });
-
-    it('应该返回不可克隆对象的原引用并发出警告', () => {
-      const weakMap = new WeakMap();
-      const weakSet = new WeakSet();
-      const promise = Promise.resolve('test');
-
-      // 这些应该返回原对象
-      expect(ReflectDeep.clone(weakMap)).toBe(weakMap);
-      expect(ReflectDeep.clone(weakSet)).toBe(weakSet);
-      expect(ReflectDeep.clone(promise)).toBe(promise);
-    });
-  });
-
   describe('get() 获取嵌套属性测试', () => {
     const testObj = {
       a: {
@@ -695,9 +524,7 @@ describe('ReflectDeep 深度反射测试', () => {
       expect(result[0].keys).toContain('length');
 
       // 应该包含 Array.prototype 层
-      const arrayProtoLayer = result.find(
-        (layer) => layer.keys.includes('push') && layer.keys.includes('pop')
-      );
+      const arrayProtoLayer = result.find((layer) => layer.keys.includes('push') && layer.keys.includes('pop'));
       expect(arrayProtoLayer).toBeDefined();
     });
 
@@ -739,7 +566,7 @@ describe('ReflectDeep 深度反射测试', () => {
 
       // 应该包含 Object.prototype
       const objectProtoLayer = result.find(
-        (layer) => layer.keys.includes('toString') && layer.keys.includes('valueOf')
+        (layer) => layer.keys.includes('toString') && layer.keys.includes('valueOf'),
       );
       expect(objectProtoLayer).toBeDefined();
     });

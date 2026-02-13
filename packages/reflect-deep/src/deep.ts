@@ -1,20 +1,5 @@
 import { isPrimitive, expectTargetAndKeys, expectTarget } from './common.js';
-import {
-  BigIntConstructor,
-  ObjectValueOf,
-  $create,
-  $isArray,
-  $isView,
-  $arrayBufferSlice,
-  $getPrototypeOf,
-  $ownKeys,
-  $has,
-  $get,
-  $set,
-  $delete,
-  $define,
-  $arrayFrom,
-} from './native.js';
+import { $getPrototypeOf, $ownKeys, $has, $get, $set, $delete, $define, $arrayFrom } from './native.js';
 
 interface ReachResult {
   /**
@@ -45,140 +30,6 @@ interface GroupedKey {
    */
   object: any;
 }
-
-function deepClone(cache: WeakMap<any, any>, o: any): any {
-  if (typeof o !== 'object' || o === null) {
-    return o;
-  }
-
-  if (cache.has(o)) {
-    return cache.get(o);
-  }
-
-  // # Boxed primitives (Number, String, Boolean, BigInt, Symbol objects)
-  if (
-    o instanceof Number ||
-    o instanceof String ||
-    o instanceof Boolean ||
-    (BigIntConstructor && o instanceof BigIntConstructor)
-  ) {
-    // Create new boxed primitive with the same value
-    const primitiveValue = ObjectValueOf.call(o);
-    if (o instanceof Number) {
-      return new Number(primitiveValue);
-    }
-    if (o instanceof String) {
-      return new String(primitiveValue);
-    }
-    if (o instanceof Boolean) {
-      return new Boolean(primitiveValue);
-    }
-    if (BigIntConstructor && o instanceof BigIntConstructor)
-      return $create(BigIntConstructor.prototype, {
-        [Symbol.toPrimitive]: {
-          value: () => primitiveValue,
-          enumerable: false,
-          configurable: false,
-        },
-      });
-  }
-
-  // # Common types
-  if ($isArray(o)) {
-    const result: any[] = [];
-    cache.set(o, result);
-    for (let i = 0; i < o.length; i++) {
-      if (i in o) {
-        result[i] = deepClone(cache, o[i]);
-      }
-    }
-    return result;
-  }
-
-  if (o instanceof Map) {
-    const result = new Map();
-    cache.set(o, result);
-    o.forEach((v, k) => result.set(deepClone(cache, k), deepClone(cache, v)));
-    return result;
-  }
-
-  if (o instanceof Set) {
-    const result = new Set();
-    cache.set(o, result);
-    o.forEach((v) => result.add(deepClone(cache, v)));
-    return result;
-  }
-
-  if (o instanceof Date) {
-    return new Date(o);
-  }
-
-  if (o instanceof RegExp) {
-    return new RegExp(o.source, o.flags);
-  }
-
-  // #  Values cannot be copied
-  if (o instanceof WeakMap) {
-    return o;
-  }
-
-  if (o instanceof WeakSet) {
-    return o;
-  }
-
-  if (o instanceof WeakRef) {
-    return new WeakRef(deepClone(cache, o.deref()));
-  }
-
-  if (o instanceof Promise) {
-    return o;
-  }
-
-  if (SharedArrayBuffer && o instanceof SharedArrayBuffer) {
-    // SharedArrayBuffer cannot be cloned safely, return the same reference
-    return o;
-  }
-
-  // # Typed arrays and DataView
-  if ($isView(o)) {
-    const TypedArray = (o as any).constructor;
-    if (o instanceof DataView) {
-      // DataView needs special handling - copy the underlying buffer and recreate
-      const clonedBuffer = $arrayBufferSlice.call(o.buffer, o.byteOffset, o.byteOffset + o.byteLength);
-      return new DataView(clonedBuffer);
-    } else {
-      // TypedArrays can be created from the original array
-      return new TypedArray(o);
-    }
-  }
-
-  if (o instanceof ArrayBuffer) {
-    return $arrayBufferSlice.call(o, 0);
-  }
-
-  // # Node.js Buffer (if available)
-  if (Buffer && o instanceof Buffer) {
-    return Buffer.from(o);
-  }
-
-  // # Copy everything else
-  const result = $create($getPrototypeOf(o));
-  cache.set(o, result);
-
-  const keys = $ownKeys(o);
-  for (let i = 0; i < keys.length; i++) {
-    // some prop may be carried over from prototype chain, so we need to check if it exists on the object
-    if (!$has(o, keys[i])) {
-      continue;
-    }
-
-    const value = $get(o, keys[i]);
-    $set(result, keys[i], deepClone(cache, value));
-  }
-  return result;
-}
-
-const NOT_PROVIDED = Symbol('NOT_PROVIDED');
 
 /**
  * ## Usage
@@ -228,11 +79,7 @@ export namespace ReflectDeep {
    * const obj = { a: { b: { c: 'hello' } } };
    * ReflectDeep.get(obj, ['a', 'b', 'c']); // 'hello'
    */
-  export const get = <T = any>(
-    target: any,
-    propertyKeys: PropertyKey[],
-    receiver: any = NOT_PROVIDED,
-  ): T | undefined => {
+  export const get = <T = any>(target: any, propertyKeys: PropertyKey[], receiver?: any): T | undefined => {
     expectTargetAndKeys('get', target, propertyKeys);
 
     let current = target;
@@ -248,7 +95,7 @@ export namespace ReflectDeep {
     }
 
     const result =
-      receiver === NOT_PROVIDED
+      receiver === undefined
         ? $get(current, propertyKeys[propertyKeys.length - 1])
         : $get(current, propertyKeys[propertyKeys.length - 1], receiver);
 
@@ -269,12 +116,7 @@ export namespace ReflectDeep {
    * ReflectDeep.set(obj, ['a', 'b', 'c'], 'hello'); // Creates nested structure
    * obj.a.b.c; // 'hello'
    */
-  export const set = <T = any>(
-    target: any,
-    propertyKeys: PropertyKey[],
-    value: T,
-    receiver: any = NOT_PROVIDED,
-  ): boolean => {
+  export const set = <T = any>(target: any, propertyKeys: PropertyKey[], value: T, receiver?: any): boolean => {
     expectTargetAndKeys('set', target, propertyKeys);
 
     let current = target;
@@ -292,7 +134,7 @@ export namespace ReflectDeep {
       }
     }
 
-    return receiver === NOT_PROVIDED
+    return receiver === undefined
       ? $set(current, propertyKeys[propertyKeys.length - 1], value)
       : $set(current, propertyKeys[propertyKeys.length - 1], value, receiver);
   };
@@ -312,7 +154,7 @@ export namespace ReflectDeep {
    * ReflectDeep.reach(obj, ['a', 'x']);     // { value: { b: { c: 'hello' } }, index: 0, reached: false }
    * ReflectDeep.reach(obj, ['d', 'x']);     // { value: { a: { b: { c: 'hello' } } }, index: -1, reached: false }
    */
-  export const reach = (target: object, propertyKeys: PropertyKey[], receiver: any = NOT_PROVIDED): ReachResult => {
+  export const reach = (target: object, propertyKeys: PropertyKey[], receiver?: any): ReachResult => {
     expectTargetAndKeys('reach', target, propertyKeys);
 
     let current = target;
@@ -323,7 +165,7 @@ export namespace ReflectDeep {
 
       if (i === propertyKeys.length - 1) {
         const value =
-          receiver === NOT_PROVIDED ? $get(current, propertyKeys[i]) : $get(current, propertyKeys[i], receiver);
+          receiver === undefined ? $get(current, propertyKeys[i]) : $get(current, propertyKeys[i], receiver);
 
         return { value, index: i, reached: true };
       }
@@ -336,23 +178,6 @@ export namespace ReflectDeep {
 
     // Should not reach here, but just in case
     return { value: current, index: -1, reached: false };
-  };
-
-  /**
-   * Creates a deep clone of an object, handling circular references and various JS types.
-   *
-   * **Circular references are fully suppported**
-   *
-   * ! Will not check depth of the object, so be careful with very deep objects.
-   * @param obj - Object to clone.
-   * @returns A deep clone of the object.
-   * @example
-   * const obj = { a: { b: [1, 2, { c: 3 }] } };
-   * const cloned = ReflectDeep.clone(obj);
-   * cloned.a.b[2].c = 4; // obj.a.b[2].c is still 3
-   */
-  export const clone = <T = any>(obj: T): T => {
-    return deepClone(new WeakMap(), obj);
   };
 
   /**
