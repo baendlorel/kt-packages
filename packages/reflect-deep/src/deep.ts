@@ -1,38 +1,19 @@
 import { isPrimitive, expectTargetAndKeys, expectTarget } from './common.js';
 import {
-  NumberConstructor,
-  StringConstructor,
-  BooleanConstructor,
   BigIntConstructor,
   ObjectValueOf,
-  ObjectCreate,
-  ArrayIsArray,
-  MapConstructor,
-  MapForEach,
-  MapSet,
-  SetConstructor,
-  SetForEach,
-  SetAdd,
-  DateConstructor,
-  RegExpConstructor,
-  WeakMapConstructor,
-  WeakSetConstructor,
-  WeakRefConstructor,
-  PromiseConstructor,
-  SharedArrayBufferConstructor,
-  ArrayBufferIsView,
-  DataViewConstructor,
-  ArrayBufferSlice,
-  BufferConstructor,
-  BufferFrom,
-  ReflectGetPrototypeOf,
-  ReflectOwnKeys,
-  ReflectHas,
-  ReflectGet,
-  ReflectSet,
-  ReflectDeleteProperty,
-  ReflectDefineProperty,
-  ArrayFromIterator,
+  $create,
+  $isArray,
+  $isView,
+  $arrayBufferSlice,
+  $getPrototypeOf,
+  $ownKeys,
+  $has,
+  $get,
+  $set,
+  $delete,
+  $define,
+  $arrayFrom,
 } from './native.js';
 
 interface ReachResult {
@@ -76,18 +57,24 @@ function deepClone(cache: WeakMap<any, any>, o: any): any {
 
   // # Boxed primitives (Number, String, Boolean, BigInt, Symbol objects)
   if (
-    o instanceof NumberConstructor ||
-    o instanceof StringConstructor ||
-    o instanceof BooleanConstructor ||
+    o instanceof Number ||
+    o instanceof String ||
+    o instanceof Boolean ||
     (BigIntConstructor && o instanceof BigIntConstructor)
   ) {
     // Create new boxed primitive with the same value
     const primitiveValue = ObjectValueOf.call(o);
-    if (o instanceof NumberConstructor) return new NumberConstructor(primitiveValue);
-    if (o instanceof StringConstructor) return new StringConstructor(primitiveValue);
-    if (o instanceof BooleanConstructor) return new BooleanConstructor(primitiveValue);
+    if (o instanceof Number) {
+      return new Number(primitiveValue);
+    }
+    if (o instanceof String) {
+      return new String(primitiveValue);
+    }
+    if (o instanceof Boolean) {
+      return new Boolean(primitiveValue);
+    }
     if (BigIntConstructor && o instanceof BigIntConstructor)
-      return ObjectCreate(BigIntConstructor.prototype, {
+      return $create(BigIntConstructor.prototype, {
         [Symbol.toPrimitive]: {
           value: () => primitiveValue,
           enumerable: false,
@@ -97,7 +84,7 @@ function deepClone(cache: WeakMap<any, any>, o: any): any {
   }
 
   // # Common types
-  if (ArrayIsArray(o)) {
+  if ($isArray(o)) {
     const result: any[] = [];
     cache.set(o, result);
     for (let i = 0; i < o.length; i++) {
@@ -108,89 +95,85 @@ function deepClone(cache: WeakMap<any, any>, o: any): any {
     return result;
   }
 
-  if (o instanceof MapConstructor) {
-    const result = new MapConstructor();
+  if (o instanceof Map) {
+    const result = new Map();
     cache.set(o, result);
-    MapForEach.call(o, (v, k) => {
-      MapSet.call(result, deepClone(cache, k), deepClone(cache, v));
-    });
+    o.forEach((v, k) => result.set(deepClone(cache, k), deepClone(cache, v)));
     return result;
   }
 
-  if (o instanceof SetConstructor) {
-    const result = new SetConstructor();
+  if (o instanceof Set) {
+    const result = new Set();
     cache.set(o, result);
-    SetForEach.call(o, (v) => {
-      SetAdd.call(result, deepClone(cache, v));
-    });
+    o.forEach((v) => result.add(deepClone(cache, v)));
     return result;
   }
 
-  if (o instanceof DateConstructor) {
-    return new DateConstructor(o);
+  if (o instanceof Date) {
+    return new Date(o);
   }
 
-  if (o instanceof RegExpConstructor) {
-    return new RegExpConstructor(o.source, o.flags);
+  if (o instanceof RegExp) {
+    return new RegExp(o.source, o.flags);
   }
 
   // #  Values cannot be copied
-  if (o instanceof WeakMapConstructor) {
+  if (o instanceof WeakMap) {
     return o;
   }
 
-  if (o instanceof WeakSetConstructor) {
+  if (o instanceof WeakSet) {
     return o;
   }
 
-  if (o instanceof WeakRefConstructor) {
-    return new WeakRefConstructor(deepClone(cache, o.deref()));
+  if (o instanceof WeakRef) {
+    return new WeakRef(deepClone(cache, o.deref()));
   }
 
-  if (o instanceof PromiseConstructor) {
+  if (o instanceof Promise) {
     return o;
   }
 
-  if (SharedArrayBufferConstructor && o instanceof SharedArrayBufferConstructor) {
+  if (SharedArrayBuffer && o instanceof SharedArrayBuffer) {
     // SharedArrayBuffer cannot be cloned safely, return the same reference
     return o;
   }
 
   // # Typed arrays and DataView
-  if (ArrayBufferIsView(o)) {
-    const TypedArrayConstructor = (o as any).constructor;
-    if (o instanceof DataViewConstructor) {
+  if ($isView(o)) {
+    const TypedArray = (o as any).constructor;
+    if (o instanceof DataView) {
       // DataView needs special handling - copy the underlying buffer and recreate
-      const clonedBuffer = ArrayBufferSlice.call(o.buffer, o.byteOffset, o.byteOffset + o.byteLength);
-      return new DataViewConstructor(clonedBuffer);
+      const clonedBuffer = $arrayBufferSlice.call(o.buffer, o.byteOffset, o.byteOffset + o.byteLength);
+      return new DataView(clonedBuffer);
     } else {
       // TypedArrays can be created from the original array
-      return new TypedArrayConstructor(o);
+      return new TypedArray(o);
     }
   }
 
   if (o instanceof ArrayBuffer) {
-    return ArrayBufferSlice.call(o, 0);
+    return $arrayBufferSlice.call(o, 0);
   }
 
   // # Node.js Buffer (if available)
-  if (BufferConstructor && o instanceof BufferConstructor) {
-    return BufferFrom!(o);
+  if (Buffer && o instanceof Buffer) {
+    return Buffer.from(o);
   }
 
   // # Copy everything else
-  const result = ObjectCreate(ReflectGetPrototypeOf(o));
+  const result = $create($getPrototypeOf(o));
   cache.set(o, result);
 
-  const keys = ReflectOwnKeys(o);
+  const keys = $ownKeys(o);
   for (let i = 0; i < keys.length; i++) {
     // some prop may be carried over from prototype chain, so we need to check if it exists on the object
-    if (!ReflectHas(o, keys[i])) {
+    if (!$has(o, keys[i])) {
       continue;
     }
 
-    const value = ReflectGet(o, keys[i]);
-    ReflectSet(result, keys[i], deepClone(cache, value));
+    const value = $get(o, keys[i]);
+    $set(result, keys[i], deepClone(cache, value));
   }
   return result;
 }
@@ -221,16 +204,16 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length - 1; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
+      if (!$has(current, propertyKeys[i])) {
         return false;
       }
 
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return false;
       }
     }
-    return ReflectHas(current, propertyKeys[propertyKeys.length - 1]);
+    return $has(current, propertyKeys[propertyKeys.length - 1]);
   };
 
   /**
@@ -254,11 +237,11 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length - 1; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
+      if (!$has(current, propertyKeys[i])) {
         return undefined;
       }
 
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return undefined;
       }
@@ -266,8 +249,8 @@ export namespace ReflectDeep {
 
     const result =
       receiver === NOT_PROVIDED
-        ? ReflectGet(current, propertyKeys[propertyKeys.length - 1])
-        : ReflectGet(current, propertyKeys[propertyKeys.length - 1], receiver);
+        ? $get(current, propertyKeys[propertyKeys.length - 1])
+        : $get(current, propertyKeys[propertyKeys.length - 1], receiver);
 
     return result as T | undefined;
   };
@@ -296,22 +279,22 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length - 1; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
-        if (!ReflectSet(current, propertyKeys[i], {})) {
+      if (!$has(current, propertyKeys[i])) {
+        if (!$set(current, propertyKeys[i], {})) {
           return false;
         }
       }
 
       // Check if current can be set
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return false;
       }
     }
 
     return receiver === NOT_PROVIDED
-      ? ReflectSet(current, propertyKeys[propertyKeys.length - 1], value)
-      : ReflectSet(current, propertyKeys[propertyKeys.length - 1], value, receiver);
+      ? $set(current, propertyKeys[propertyKeys.length - 1], value)
+      : $set(current, propertyKeys[propertyKeys.length - 1], value, receiver);
   };
 
   /**
@@ -334,20 +317,18 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
+      if (!$has(current, propertyKeys[i])) {
         return { value: current, index: i - 1, reached: false };
       }
 
       if (i === propertyKeys.length - 1) {
         const value =
-          receiver === NOT_PROVIDED
-            ? ReflectGet(current, propertyKeys[i])
-            : ReflectGet(current, propertyKeys[i], receiver);
+          receiver === NOT_PROVIDED ? $get(current, propertyKeys[i]) : $get(current, propertyKeys[i], receiver);
 
         return { value, index: i, reached: true };
       }
 
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return { value: current, index: i, reached: false };
       }
@@ -371,7 +352,7 @@ export namespace ReflectDeep {
    * cloned.a.b[2].c = 4; // obj.a.b[2].c is still 3
    */
   export const clone = <T = any>(obj: T): T => {
-    return deepClone(new WeakMapConstructor(), obj);
+    return deepClone(new WeakMap(), obj);
   };
 
   /**
@@ -396,17 +377,17 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length - 1; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
+      if (!$has(current, propertyKeys[i])) {
         return true;
       }
 
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return false;
       }
     }
 
-    return ReflectDeleteProperty(current, propertyKeys[propertyKeys.length - 1]);
+    return $delete(current, propertyKeys[propertyKeys.length - 1]);
   };
 
   /**
@@ -438,19 +419,19 @@ export namespace ReflectDeep {
 
     let current = target;
     for (let i = 0; i < propertyKeys.length - 1; i++) {
-      if (!ReflectHas(current, propertyKeys[i])) {
-        if (!ReflectSet(current, propertyKeys[i], {})) {
+      if (!$has(current, propertyKeys[i])) {
+        if (!$set(current, propertyKeys[i], {})) {
           return false;
         }
       }
 
-      current = ReflectGet(current, propertyKeys[i]);
+      current = $get(current, propertyKeys[i]);
       if (isPrimitive(current)) {
         return false;
       }
     }
 
-    return ReflectDefineProperty(current, propertyKeys[propertyKeys.length - 1], descriptor);
+    return $define(current, propertyKeys[propertyKeys.length - 1], descriptor);
   };
 
   /**
@@ -475,19 +456,19 @@ export namespace ReflectDeep {
   export const keys = <T extends object>(target: T): (string | symbol)[] => {
     expectTarget('keys', target);
 
-    const keySet = new SetConstructor(ReflectOwnKeys(target));
+    const keySet = new Set($ownKeys(target));
     let proto: object | null = target;
     while (true) {
-      proto = ReflectGetPrototypeOf(proto);
+      proto = $getPrototypeOf(proto);
 
       // * Proto chain will not contain any loop
       if (proto) {
-        const keys = ReflectOwnKeys(proto);
+        const keys = $ownKeys(proto);
         for (let i = 0; i < keys.length; i++) {
-          SetAdd.call(keySet, keys[i]);
+          keySet.add(keys[i]);
         }
       } else {
-        return ArrayFromIterator(keySet);
+        return $arrayFrom(keySet);
       }
     }
   };
@@ -521,8 +502,8 @@ export namespace ReflectDeep {
   export const groupedKeys = <T extends object>(target: T): GroupedKey[] => {
     expectTarget('groupedKeys', target);
 
-    const keys: GroupedKey[] = [{ keys: ReflectOwnKeys(target), object: target }];
-    let proto = ReflectGetPrototypeOf(target);
+    const keys: GroupedKey[] = [{ keys: $ownKeys(target), object: target }];
+    let proto = $getPrototypeOf(target);
     while (true) {
       // * Proto chain will not contain any loop
       if (!proto) {
@@ -530,9 +511,9 @@ export namespace ReflectDeep {
       }
       keys.push({
         object: proto,
-        keys: ReflectOwnKeys(proto),
+        keys: $ownKeys(proto),
       });
-      proto = ReflectGetPrototypeOf(proto);
+      proto = $getPrototypeOf(proto);
     }
   };
 }
