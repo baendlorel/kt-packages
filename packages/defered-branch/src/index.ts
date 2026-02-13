@@ -1,7 +1,7 @@
-import { DeferedBranch } from './defered-branch/default.js';
-import { DeferedBranchDynamic } from './defered-branch/dynamic.js';
-import { DeferedBranchAllDynamic } from './defered-branch/all-dynamic.js';
-import { DeferedBranchAll } from './defered-branch/all.js';
+import { DeferedBranch } from './core/default.js';
+import { DeferedBranchDynamic } from './core/dynamic.js';
+import { DeferedBranchAllDynamic } from './core/all-dynamic.js';
+import { DeferedBranchAll } from './core/all.js';
 
 /**
  * ## Steps to use
@@ -94,10 +94,8 @@ export const deferedBranchDynamic = <
  *
  * __PKG_INFO__
  */
-export const deferedBranchAll = <
-  BranchFn extends AnyFn = AnyFn,
-  NoMatchFn extends AnyFn = AnyFn,
->() => new DeferedBranchAll<BranchFn, NoMatchFn>();
+export const deferedBranchAll = <BranchFn extends AnyFn = AnyFn, NoMatchFn extends AnyFn = AnyFn>() =>
+  new DeferedBranchAll<BranchFn, NoMatchFn>();
 
 /**
  * ## Steps to use
