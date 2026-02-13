@@ -14,8 +14,12 @@ export class IfParser {
   private readonly _opts: RollupConditionalCompilationOptions;
   private readonly _keys: string[] = [];
   private readonly _values: any[] = [];
-  constructor(_opts: RollupConditionalCompilationOptions) {
-    this._opts = _opts;
+  constructor(_opts: Partial<RollupConditionalCompilationOptions>) {
+    this._opts = {
+      variables: _opts.variables ?? {},
+      sourceType: _opts.sourceType ?? 'module',
+      ecmaVersion: _opts.ecmaVersion ?? 'latest',
+    };
     const kv = Object.entries(this._opts.variables);
     for (let i = 0; i < kv.length; i++) {
       this._keys.push(kv[i][0]);

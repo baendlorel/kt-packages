@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { IfParser } from '../src/compiler/parser.js';
-import { loadjs } from './setup.js';
+import { codeOf, loadjs } from './setup.js';
 
 describe('Advanced if/elif/else compilation tests', () => {
   describe('case10: Complex elif chains and nested elif', () => {
@@ -13,11 +13,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('a-true');");
-      expect(result).not.toContain("console.log('b-true');");
-      expect(result).not.toContain("console.log('c-true');");
-      expect(result).not.toContain("console.log('all-false');");
-      expect(result).not.toContain("console.log('x-start');");
+      expect(codeOf(result)).toContain("console.log('a-true');");
+      expect(codeOf(result)).not.toContain("console.log('b-true');");
+      expect(codeOf(result)).not.toContain("console.log('c-true');");
+      expect(codeOf(result)).not.toContain("console.log('all-false');");
+      expect(codeOf(result)).not.toContain("console.log('x-start');");
     });
 
     it('should handle elif when first condition is false', () => {
@@ -29,10 +29,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-true');");
-      expect(result).toContain("console.log('b-true');");
-      expect(result).not.toContain("console.log('c-true');");
-      expect(result).not.toContain("console.log('all-false');");
+      expect(codeOf(result)).not.toContain("console.log('a-true');");
+      expect(codeOf(result)).toContain("console.log('b-true');");
+      expect(codeOf(result)).not.toContain("console.log('c-true');");
+      expect(codeOf(result)).not.toContain("console.log('all-false');");
     });
 
     it('should handle third elif condition', () => {
@@ -44,10 +44,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-true');");
-      expect(result).not.toContain("console.log('b-true');");
-      expect(result).toContain("console.log('c-true');");
-      expect(result).not.toContain("console.log('all-false');");
+      expect(codeOf(result)).not.toContain("console.log('a-true');");
+      expect(codeOf(result)).not.toContain("console.log('b-true');");
+      expect(codeOf(result)).toContain("console.log('c-true');");
+      expect(codeOf(result)).not.toContain("console.log('all-false');");
     });
 
     it('should handle else when all elif conditions are false', () => {
@@ -59,10 +59,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-true');");
-      expect(result).not.toContain("console.log('b-true');");
-      expect(result).not.toContain("console.log('c-true');");
-      expect(result).toContain("console.log('all-false');");
+      expect(codeOf(result)).not.toContain("console.log('a-true');");
+      expect(codeOf(result)).not.toContain("console.log('b-true');");
+      expect(codeOf(result)).not.toContain("console.log('c-true');");
+      expect(codeOf(result)).toContain("console.log('all-false');");
     });
 
     it('should handle nested elif inside if block', () => {
@@ -74,11 +74,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('x-start');");
-      expect(result).not.toContain("console.log('xy-true');");
-      expect(result).toContain("console.log('xz-true');");
-      expect(result).not.toContain("console.log('x-but-not-yz');");
-      expect(result).toContain("console.log('x-end');");
+      expect(codeOf(result)).toContain("console.log('x-start');");
+      expect(codeOf(result)).not.toContain("console.log('xy-true');");
+      expect(codeOf(result)).toContain("console.log('xz-true');");
+      expect(codeOf(result)).not.toContain("console.log('x-but-not-yz');");
+      expect(codeOf(result)).toContain("console.log('x-end');");
     });
 
     it('should handle nested else when all inner conditions are false', () => {
@@ -90,11 +90,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('x-start');");
-      expect(result).not.toContain("console.log('xy-true');");
-      expect(result).not.toContain("console.log('xz-true');");
-      expect(result).toContain("console.log('x-but-not-yz');");
-      expect(result).toContain("console.log('x-end');");
+      expect(codeOf(result)).toContain("console.log('x-start');");
+      expect(codeOf(result)).not.toContain("console.log('xy-true');");
+      expect(codeOf(result)).not.toContain("console.log('xz-true');");
+      expect(codeOf(result)).toContain("console.log('x-but-not-yz');");
+      expect(codeOf(result)).toContain("console.log('x-end');");
     });
   });
 
@@ -108,12 +108,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('never1');");
-      expect(result).not.toContain("console.log('never2');");
-      expect(result).not.toContain("console.log('never3');");
-      expect(result).toContain("console.log('fourth-condition');");
-      expect(result).not.toContain("console.log('never4');");
-      expect(result).not.toContain("console.log('never5');");
+      expect(codeOf(result)).not.toContain("console.log('never1');");
+      expect(codeOf(result)).not.toContain("console.log('never2');");
+      expect(codeOf(result)).not.toContain("console.log('never3');");
+      expect(codeOf(result)).toContain("console.log('fourth-condition');");
+      expect(codeOf(result)).not.toContain("console.log('never4');");
+      expect(codeOf(result)).not.toContain("console.log('never5');");
     });
 
     it('should not execute elif after a true elif', () => {
@@ -126,9 +126,9 @@ describe('Advanced if/elif/else compilation tests', () => {
       const result = parser.proceed(code);
 
       // Fourth condition is true, so fifth elif and else should not execute
-      expect(result).toContain("console.log('fourth-condition');");
-      expect(result).not.toContain("console.log('never4');");
-      expect(result).not.toContain("console.log('never5');");
+      expect(codeOf(result)).toContain("console.log('fourth-condition');");
+      expect(codeOf(result)).not.toContain("console.log('never4');");
+      expect(codeOf(result)).not.toContain("console.log('never5');");
     });
 
     it('should handle deep nesting with elif at level 2', () => {
@@ -140,12 +140,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('L1-start');");
-      expect(result).not.toContain("console.log('L2-start');");
-      expect(result).toContain("console.log('L2-alt');");
-      expect(result).toContain("console.log('L3-deep');");
-      expect(result).not.toContain("console.log('L2-else');");
-      expect(result).toContain("console.log('L1-end');");
+      expect(codeOf(result)).toContain("console.log('L1-start');");
+      expect(codeOf(result)).not.toContain("console.log('L2-start');");
+      expect(codeOf(result)).toContain("console.log('L2-alt');");
+      expect(codeOf(result)).toContain("console.log('L3-deep');");
+      expect(codeOf(result)).not.toContain("console.log('L2-else');");
+      expect(codeOf(result)).toContain("console.log('L1-end');");
     });
 
     it('should handle deep nesting with else branch', () => {
@@ -157,11 +157,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('L1-start');");
-      expect(result).not.toContain("console.log('L2-start');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).toContain("console.log('L2-else');");
-      expect(result).toContain("console.log('L1-end');");
+      expect(codeOf(result)).toContain("console.log('L1-start');");
+      expect(codeOf(result)).not.toContain("console.log('L2-start');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).toContain("console.log('L2-else');");
+      expect(codeOf(result)).toContain("console.log('L1-end');");
     });
   });
 
@@ -175,10 +175,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('a-large');");
-      expect(result).not.toContain("console.log('a-medium');");
-      expect(result).not.toContain("console.log('a-small');");
-      expect(result).not.toContain("console.log('a-nonpositive');");
+      expect(codeOf(result)).toContain("console.log('a-large');");
+      expect(codeOf(result)).not.toContain("console.log('a-medium');");
+      expect(codeOf(result)).not.toContain("console.log('a-small');");
+      expect(codeOf(result)).not.toContain("console.log('a-nonpositive');");
     });
 
     it('should evaluate numeric comparison in if/elif chain - medium value', () => {
@@ -190,10 +190,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-large');");
-      expect(result).toContain("console.log('a-medium');");
-      expect(result).not.toContain("console.log('a-small');");
-      expect(result).not.toContain("console.log('a-nonpositive');");
+      expect(codeOf(result)).not.toContain("console.log('a-large');");
+      expect(codeOf(result)).toContain("console.log('a-medium');");
+      expect(codeOf(result)).not.toContain("console.log('a-small');");
+      expect(codeOf(result)).not.toContain("console.log('a-nonpositive');");
     });
 
     it('should evaluate numeric comparison in if/elif chain - small value', () => {
@@ -205,10 +205,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-large');");
-      expect(result).not.toContain("console.log('a-medium');");
-      expect(result).toContain("console.log('a-small');");
-      expect(result).not.toContain("console.log('a-nonpositive');");
+      expect(codeOf(result)).not.toContain("console.log('a-large');");
+      expect(codeOf(result)).not.toContain("console.log('a-medium');");
+      expect(codeOf(result)).toContain("console.log('a-small');");
+      expect(codeOf(result)).not.toContain("console.log('a-nonpositive');");
     });
 
     it('should evaluate numeric comparison in if/elif chain - nonpositive', () => {
@@ -220,10 +220,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('a-large');");
-      expect(result).not.toContain("console.log('a-medium');");
-      expect(result).not.toContain("console.log('a-small');");
-      expect(result).toContain("console.log('a-nonpositive');");
+      expect(codeOf(result)).not.toContain("console.log('a-large');");
+      expect(codeOf(result)).not.toContain("console.log('a-medium');");
+      expect(codeOf(result)).not.toContain("console.log('a-small');");
+      expect(codeOf(result)).toContain("console.log('a-nonpositive');");
     });
 
     it('should handle logical AND in if branch', () => {
@@ -235,9 +235,9 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('xy-both');");
-      expect(result).not.toContain("console.log('xy-either');");
-      expect(result).not.toContain("console.log('xy-neither');");
+      expect(codeOf(result)).toContain("console.log('xy-both');");
+      expect(codeOf(result)).not.toContain("console.log('xy-either');");
+      expect(codeOf(result)).not.toContain("console.log('xy-neither');");
     });
 
     it('should handle logical OR in elif branch', () => {
@@ -249,9 +249,9 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('xy-both');");
-      expect(result).toContain("console.log('xy-either');");
-      expect(result).not.toContain("console.log('xy-neither');");
+      expect(codeOf(result)).not.toContain("console.log('xy-both');");
+      expect(codeOf(result)).toContain("console.log('xy-either');");
+      expect(codeOf(result)).not.toContain("console.log('xy-neither');");
     });
 
     it('should handle logical NOT in second elif branch', () => {
@@ -263,9 +263,9 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('xy-both');");
-      expect(result).not.toContain("console.log('xy-either');");
-      expect(result).toContain("console.log('xy-neither');");
+      expect(codeOf(result)).not.toContain("console.log('xy-both');");
+      expect(codeOf(result)).not.toContain("console.log('xy-either');");
+      expect(codeOf(result)).toContain("console.log('xy-neither');");
     });
 
     it('should handle string equality in if/elif chain - prod', () => {
@@ -277,10 +277,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('production');");
-      expect(result).not.toContain("console.log('development');");
-      expect(result).not.toContain("console.log('testing');");
-      expect(result).not.toContain("console.log('unknown-type');");
+      expect(codeOf(result)).toContain("console.log('production');");
+      expect(codeOf(result)).not.toContain("console.log('development');");
+      expect(codeOf(result)).not.toContain("console.log('testing');");
+      expect(codeOf(result)).not.toContain("console.log('unknown-type');");
     });
 
     it('should handle string equality in if/elif chain - dev', () => {
@@ -292,10 +292,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('production');");
-      expect(result).toContain("console.log('development');");
-      expect(result).not.toContain("console.log('testing');");
-      expect(result).not.toContain("console.log('unknown-type');");
+      expect(codeOf(result)).not.toContain("console.log('production');");
+      expect(codeOf(result)).toContain("console.log('development');");
+      expect(codeOf(result)).not.toContain("console.log('testing');");
+      expect(codeOf(result)).not.toContain("console.log('unknown-type');");
     });
 
     it('should handle string equality in if/elif chain - test', () => {
@@ -307,10 +307,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('production');");
-      expect(result).not.toContain("console.log('development');");
-      expect(result).toContain("console.log('testing');");
-      expect(result).not.toContain("console.log('unknown-type');");
+      expect(codeOf(result)).not.toContain("console.log('production');");
+      expect(codeOf(result)).not.toContain("console.log('development');");
+      expect(codeOf(result)).toContain("console.log('testing');");
+      expect(codeOf(result)).not.toContain("console.log('unknown-type');");
     });
 
     it('should handle string equality else branch', () => {
@@ -322,10 +322,10 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('production');");
-      expect(result).not.toContain("console.log('development');");
-      expect(result).not.toContain("console.log('testing');");
-      expect(result).toContain("console.log('unknown-type');");
+      expect(codeOf(result)).not.toContain("console.log('production');");
+      expect(codeOf(result)).not.toContain("console.log('development');");
+      expect(codeOf(result)).not.toContain("console.log('testing');");
+      expect(codeOf(result)).toContain("console.log('unknown-type');");
     });
   });
 
@@ -354,13 +354,13 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('block1-a');");
-      expect(result).not.toContain("console.log('block2-b');");
-      expect(result).toContain("console.log('block2-c');");
-      expect(result).not.toContain("console.log('block3-d');");
-      expect(result).not.toContain("console.log('block3-e');");
-      expect(result).toContain("console.log('block3-f');");
-      expect(result).not.toContain("console.log('block3-none');");
+      expect(codeOf(result)).not.toContain("console.log('block1-a');");
+      expect(codeOf(result)).not.toContain("console.log('block2-b');");
+      expect(codeOf(result)).toContain("console.log('block2-c');");
+      expect(codeOf(result)).not.toContain("console.log('block3-d');");
+      expect(codeOf(result)).not.toContain("console.log('block3-e');");
+      expect(codeOf(result)).toContain("console.log('block3-f');");
+      expect(codeOf(result)).not.toContain("console.log('block3-none');");
     });
 
     it('should handle extreme nesting 4 levels deep with if at each level', () => {
@@ -387,14 +387,14 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('L1');");
-      expect(result).toContain("console.log('L2');");
-      expect(result).toContain("console.log('L3');");
-      expect(result).toContain("console.log('L4-deepest');");
-      expect(result).not.toContain("console.log('L4-alt');");
-      expect(result).not.toContain("console.log('L3-alt');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).not.toContain("console.log('L1-alt');");
+      expect(codeOf(result)).toContain("console.log('L1');");
+      expect(codeOf(result)).toContain("console.log('L2');");
+      expect(codeOf(result)).toContain("console.log('L3');");
+      expect(codeOf(result)).toContain("console.log('L4-deepest');");
+      expect(codeOf(result)).not.toContain("console.log('L4-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L3-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L1-alt');");
     });
 
     it('should handle extreme nesting with elif at level 4', () => {
@@ -421,14 +421,14 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('L1');");
-      expect(result).toContain("console.log('L2');");
-      expect(result).toContain("console.log('L3');");
-      expect(result).not.toContain("console.log('L4-deepest');");
-      expect(result).toContain("console.log('L4-alt');");
-      expect(result).not.toContain("console.log('L3-alt');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).not.toContain("console.log('L1-alt');");
+      expect(codeOf(result)).toContain("console.log('L1');");
+      expect(codeOf(result)).toContain("console.log('L2');");
+      expect(codeOf(result)).toContain("console.log('L3');");
+      expect(codeOf(result)).not.toContain("console.log('L4-deepest');");
+      expect(codeOf(result)).toContain("console.log('L4-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L3-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L1-alt');");
     });
 
     it('should handle extreme nesting with elif at level 3', () => {
@@ -455,14 +455,14 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('L1');");
-      expect(result).toContain("console.log('L2');");
-      expect(result).not.toContain("console.log('L3');");
-      expect(result).not.toContain("console.log('L4-deepest');");
-      expect(result).not.toContain("console.log('L4-alt');");
-      expect(result).toContain("console.log('L3-alt');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).not.toContain("console.log('L1-alt');");
+      expect(codeOf(result)).toContain("console.log('L1');");
+      expect(codeOf(result)).toContain("console.log('L2');");
+      expect(codeOf(result)).not.toContain("console.log('L3');");
+      expect(codeOf(result)).not.toContain("console.log('L4-deepest');");
+      expect(codeOf(result)).not.toContain("console.log('L4-alt');");
+      expect(codeOf(result)).toContain("console.log('L3-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L1-alt');");
     });
 
     it('should handle extreme nesting with elif at top level', () => {
@@ -489,14 +489,14 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('L1');");
-      expect(result).not.toContain("console.log('L2');");
-      expect(result).not.toContain("console.log('L3');");
-      expect(result).not.toContain("console.log('L4-deepest');");
-      expect(result).not.toContain("console.log('L4-alt');");
-      expect(result).not.toContain("console.log('L3-alt');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).toContain("console.log('L1-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L1');");
+      expect(codeOf(result)).not.toContain("console.log('L2');");
+      expect(codeOf(result)).not.toContain("console.log('L3');");
+      expect(codeOf(result)).not.toContain("console.log('L4-deepest');");
+      expect(codeOf(result)).not.toContain("console.log('L4-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L3-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).toContain("console.log('L1-alt');");
     });
   });
 
@@ -519,12 +519,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('one');");
-      expect(result).not.toContain("console.log('two');");
-      expect(result).not.toContain("console.log('three');");
-      expect(result).not.toContain("console.log('four');");
-      expect(result).not.toContain("console.log('five');");
-      expect(result).not.toContain("console.log('other');");
+      expect(codeOf(result)).toContain("console.log('one');");
+      expect(codeOf(result)).not.toContain("console.log('two');");
+      expect(codeOf(result)).not.toContain("console.log('three');");
+      expect(codeOf(result)).not.toContain("console.log('four');");
+      expect(codeOf(result)).not.toContain("console.log('five');");
+      expect(codeOf(result)).not.toContain("console.log('other');");
     });
 
     it('should handle switch-like elif chain - value 3', () => {
@@ -545,12 +545,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('one');");
-      expect(result).not.toContain("console.log('two');");
-      expect(result).toContain("console.log('three');");
-      expect(result).not.toContain("console.log('four');");
-      expect(result).not.toContain("console.log('five');");
-      expect(result).not.toContain("console.log('other');");
+      expect(codeOf(result)).not.toContain("console.log('one');");
+      expect(codeOf(result)).not.toContain("console.log('two');");
+      expect(codeOf(result)).toContain("console.log('three');");
+      expect(codeOf(result)).not.toContain("console.log('four');");
+      expect(codeOf(result)).not.toContain("console.log('five');");
+      expect(codeOf(result)).not.toContain("console.log('other');");
     });
 
     it('should handle switch-like elif chain - default case', () => {
@@ -571,12 +571,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('one');");
-      expect(result).not.toContain("console.log('two');");
-      expect(result).not.toContain("console.log('three');");
-      expect(result).not.toContain("console.log('four');");
-      expect(result).not.toContain("console.log('five');");
-      expect(result).toContain("console.log('other');");
+      expect(codeOf(result)).not.toContain("console.log('one');");
+      expect(codeOf(result)).not.toContain("console.log('two');");
+      expect(codeOf(result)).not.toContain("console.log('three');");
+      expect(codeOf(result)).not.toContain("console.log('four');");
+      expect(codeOf(result)).not.toContain("console.log('five');");
+      expect(codeOf(result)).toContain("console.log('other');");
     });
 
     it('should handle nested elif with multiple inner branches - outer true, inner_b', () => {
@@ -597,14 +597,14 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('outer-start');");
-      expect(result).not.toContain("console.log('inner-a');");
-      expect(result).toContain("console.log('inner-b');");
-      expect(result).not.toContain("console.log('inner-c');");
-      expect(result).not.toContain("console.log('inner-default');");
-      expect(result).toContain("console.log('outer-middle');");
-      expect(result).toContain("console.log('second-default');");
-      expect(result).toContain("console.log('outer-end');");
+      expect(codeOf(result)).toContain("console.log('outer-start');");
+      expect(codeOf(result)).not.toContain("console.log('inner-a');");
+      expect(codeOf(result)).toContain("console.log('inner-b');");
+      expect(codeOf(result)).not.toContain("console.log('inner-c');");
+      expect(codeOf(result)).not.toContain("console.log('inner-default');");
+      expect(codeOf(result)).toContain("console.log('outer-middle');");
+      expect(codeOf(result)).toContain("console.log('second-default');");
+      expect(codeOf(result)).toContain("console.log('outer-end');");
     });
 
     it('should handle nested elif with multiple inner branches - outer true, second_a', () => {
@@ -625,13 +625,13 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('outer-start');");
-      expect(result).toContain("console.log('inner-default');");
-      expect(result).toContain("console.log('outer-middle');");
-      expect(result).toContain("console.log('second-a');");
-      expect(result).not.toContain("console.log('second-b');");
-      expect(result).not.toContain("console.log('second-default');");
-      expect(result).toContain("console.log('outer-end');");
+      expect(codeOf(result)).toContain("console.log('outer-start');");
+      expect(codeOf(result)).toContain("console.log('inner-default');");
+      expect(codeOf(result)).toContain("console.log('outer-middle');");
+      expect(codeOf(result)).toContain("console.log('second-a');");
+      expect(codeOf(result)).not.toContain("console.log('second-b');");
+      expect(codeOf(result)).not.toContain("console.log('second-default');");
+      expect(codeOf(result)).toContain("console.log('outer-end');");
     });
 
     it('should handle outer elif branch', () => {
@@ -652,11 +652,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('outer-start');");
-      expect(result).not.toContain("console.log('inner-a');");
-      expect(result).not.toContain("console.log('outer-middle');");
-      expect(result).toContain("console.log('outer-alt');");
-      expect(result).not.toContain("console.log('outer-default');");
+      expect(codeOf(result)).not.toContain("console.log('outer-start');");
+      expect(codeOf(result)).not.toContain("console.log('inner-a');");
+      expect(codeOf(result)).not.toContain("console.log('outer-middle');");
+      expect(codeOf(result)).toContain("console.log('outer-alt');");
+      expect(codeOf(result)).not.toContain("console.log('outer-default');");
     });
 
     it('should handle outer else branch', () => {
@@ -677,9 +677,9 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('outer-start');");
-      expect(result).not.toContain("console.log('outer-alt');");
-      expect(result).toContain("console.log('outer-default');");
+      expect(codeOf(result)).not.toContain("console.log('outer-start');");
+      expect(codeOf(result)).not.toContain("console.log('outer-alt');");
+      expect(codeOf(result)).toContain("console.log('outer-default');");
     });
   });
 
@@ -739,15 +739,15 @@ describe('Advanced if/elif/else compilation tests', () => {
       const result = parser.proceed(code);
 
       // All conditions are false, so all nested code should be removed
-      expect(result).not.toContain("console.log('L1');");
-      expect(result).not.toContain("console.log('L2');");
-      expect(result).not.toContain("console.log('L3');");
-      expect(result).not.toContain("console.log('L4-deepest');");
-      expect(result).not.toContain("console.log('L4-alt');");
-      expect(result).not.toContain("console.log('L3-alt');");
-      expect(result).not.toContain("console.log('L2-alt');");
-      expect(result).not.toContain("console.log('L1-alt');");
-      expect(result).toContain("console.log('done13');");
+      expect(codeOf(result)).not.toContain("console.log('L1');");
+      expect(codeOf(result)).not.toContain("console.log('L2');");
+      expect(codeOf(result)).not.toContain("console.log('L3');");
+      expect(codeOf(result)).not.toContain("console.log('L4-deepest');");
+      expect(codeOf(result)).not.toContain("console.log('L4-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L3-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L2-alt');");
+      expect(codeOf(result)).not.toContain("console.log('L1-alt');");
+      expect(codeOf(result)).toContain("console.log('done13');");
     });
 
     it('should handle mixed true/false at different nesting levels', () => {
@@ -774,11 +774,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('block1-a');");
-      expect(result).toContain("console.log('block2-c');");
-      expect(result).toContain("console.log('block3-e');");
-      expect(result).toContain("console.log('L1');");
-      expect(result).toContain("console.log('L2-alt');");
+      expect(codeOf(result)).toContain("console.log('block1-a');");
+      expect(codeOf(result)).toContain("console.log('block2-c');");
+      expect(codeOf(result)).toContain("console.log('block3-e');");
+      expect(codeOf(result)).toContain("console.log('L1');");
+      expect(codeOf(result)).toContain("console.log('L2-alt');");
     });
 
     it('should preserve code outside all conditional blocks', () => {
@@ -790,11 +790,11 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('done10');");
-      expect(result).not.toContain('#if');
-      expect(result).not.toContain('#elif');
-      expect(result).not.toContain('#else');
-      expect(result).not.toContain('#endif');
+      expect(codeOf(result)).toContain("console.log('done10');");
+      expect(codeOf(result)).not.toContain('#if');
+      expect(codeOf(result)).not.toContain('#elif');
+      expect(codeOf(result)).not.toContain('#else');
+      expect(codeOf(result)).not.toContain('#endif');
     });
 
     it('should handle zero/falsy values in elif numeric comparisons', () => {
@@ -806,7 +806,7 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).toContain("console.log('a-nonpositive');");
+      expect(codeOf(result)).toContain("console.log('a-nonpositive');");
     });
 
     it('should handle long elif chain with all false except last', () => {
@@ -827,12 +827,12 @@ describe('Advanced if/elif/else compilation tests', () => {
       });
       const result = parser.proceed(code);
 
-      expect(result).not.toContain("console.log('one');");
-      expect(result).not.toContain("console.log('two');");
-      expect(result).not.toContain("console.log('three');");
-      expect(result).not.toContain("console.log('four');");
-      expect(result).toContain("console.log('five');");
-      expect(result).not.toContain("console.log('other');");
+      expect(codeOf(result)).not.toContain("console.log('one');");
+      expect(codeOf(result)).not.toContain("console.log('two');");
+      expect(codeOf(result)).not.toContain("console.log('three');");
+      expect(codeOf(result)).not.toContain("console.log('four');");
+      expect(codeOf(result)).toContain("console.log('five');");
+      expect(codeOf(result)).not.toContain("console.log('other');");
     });
   });
 });
