@@ -1,7 +1,6 @@
 const concat = Array.prototype.concat;
 const filter = Array.prototype.filter;
-const isArrayArg = [Array.isArray];
-const apply = Reflect.apply;
+const isArray = Array.isArray;
 
 /**
  * ## Usage
@@ -18,6 +17,6 @@ export function concatArr(...args: any[]): any[] {
   if (args.length === 0) {
     return [];
   }
-  const b = apply(filter, args, isArrayArg);
-  return apply(concat, [], b);
+  const b = filter.call(args, isArray);
+  return concat.apply([], b);
 }
