@@ -4,11 +4,6 @@ export const defineProperty = Reflect.defineProperty;
 
 export const isArray = Array.isArray;
 
-export const PromiseResolve = Promise.resolve.bind(Promise);
-export const PromiseReject = Promise.reject.bind(Promise);
-
-export const isThenable = (value: any): value is Promise<any> => typeof value?.then === 'function';
-
 // use same default functions to reduce memory usage
 const DEFAULT_BREAKER = () => false;
 const DEFAULT_SKIPPER = DEFAULT_BREAKER;

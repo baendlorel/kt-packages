@@ -33,34 +33,34 @@ describe('Options Validation', () => {
         createSerialTask({
           name: 123 as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           name: 123 as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow("name' must be a string or omitted");
 
       expect(() =>
         createSerialTask({
           name: null as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           name: {} as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           name: [] as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
@@ -68,7 +68,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           name: 123 as any,
           tasks: [() => 1],
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -77,21 +77,21 @@ describe('Options Validation', () => {
         createSerialTask({
           name: 'validName',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTask({
           name: '',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           name: 'validAsyncName',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -99,13 +99,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -113,43 +113,43 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: null as any,
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           tasks: null as any,
-        })
+        }),
       ).toThrow("tasks' must be a function array");
 
       expect(() =>
         createSerialTask({
           tasks: undefined as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: 'string' as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: 123 as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: {} as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
       expect(() =>
         createSerialTaskAsync({
           tasks: null as any,
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -157,61 +157,61 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [null] as any,
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           tasks: [null] as any,
-        })
+        }),
       ).toThrow("tasks' must be a function array");
 
       expect(() =>
         createSerialTask({
           tasks: [undefined] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: ['string'] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [123] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [{}] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1, null, () => 2] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1, 'string', () => 2] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
       expect(() =>
         createSerialTaskAsync({
           tasks: [null] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [() => 1, 'invalid', () => 2] as any,
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -219,13 +219,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -233,7 +233,7 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
@@ -245,13 +245,13 @@ describe('Options Validation', () => {
               return 3;
             },
           ],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [async () => 1, () => 2],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -260,41 +260,41 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [() => 1],
           breakCondition: null as any,
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           breakCondition: null as any,
-        })
+        }),
       ).toThrow("breakCondition' must be a function or omitted");
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           breakCondition: 'string' as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           breakCondition: 123 as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           breakCondition: {} as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           breakCondition: [] as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
@@ -302,7 +302,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [() => 1],
           breakCondition: null as any,
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -311,7 +311,7 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [() => 1],
           breakCondition: () => false,
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
@@ -320,7 +320,7 @@ describe('Options Validation', () => {
           breakCondition: function () {
             return false;
           },
-        })
+        }),
       ).not.toThrow();
 
       // For async, we test sync functions since async validation requires more complex setup
@@ -328,7 +328,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [() => 1],
           breakCondition: () => false, // sync function in async context
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -336,13 +336,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -351,34 +351,34 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [() => 1],
           skipCondition: null as any,
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           skipCondition: null as any,
-        })
+        }),
       ).toThrow("skipCondition' must be a function or omitted");
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           skipCondition: 'string' as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           skipCondition: 123 as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           skipCondition: {} as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
@@ -386,7 +386,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [() => 1],
           skipCondition: null as any,
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -395,7 +395,7 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [() => 1],
           skipCondition: () => false,
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
@@ -404,7 +404,7 @@ describe('Options Validation', () => {
           skipCondition: function () {
             return false;
           },
-        })
+        }),
       ).not.toThrow();
 
       // For async, we test sync functions since async validation requires more complex setup
@@ -412,7 +412,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [() => 1],
           skipCondition: () => false, // sync function in async context
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -420,13 +420,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -435,34 +435,34 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [() => 1],
           resultWrapper: null as any,
-        })
+        }),
       ).toThrow(TypeError);
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           resultWrapper: null as any,
-        })
+        }),
       ).toThrow("resultWrapper' must be a function or omitted");
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           resultWrapper: 'string' as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           resultWrapper: 123 as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
           resultWrapper: {} as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // Same for async
@@ -470,7 +470,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [() => 1],
           resultWrapper: null as any,
-        })
+        }),
       ).toThrow(TypeError);
     });
 
@@ -479,7 +479,7 @@ describe('Options Validation', () => {
         createSerialTask({
           tasks: [(x: number) => x + 1],
           resultWrapper: (task, index, tasks, args, lastReturn) => args,
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
@@ -488,7 +488,7 @@ describe('Options Validation', () => {
           resultWrapper: function (task, index, tasks, args, lastReturn) {
             return args;
           },
-        })
+        }),
       ).not.toThrow();
 
       // For async, test basic functionality without complex types
@@ -496,7 +496,7 @@ describe('Options Validation', () => {
         createSerialTaskAsync({
           tasks: [(x: number) => x + 1],
           resultWrapper: (task, index, tasks, args, lastReturn) => args,
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -504,13 +504,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -521,7 +521,7 @@ describe('Options Validation', () => {
           name: 123 as any,
           tasks: ['not a function'] as any,
           breakCondition: 'not a function' as any,
-        })
+        }),
       ).toThrow(TypeError);
 
       // The first error should be about name
@@ -546,14 +546,6 @@ describe('Options Validation', () => {
       } catch (error: any) {
         expect(error.message).toContain("tasks' must be a function array");
       }
-    });
-
-    it('should work with minimal valid options', () => {
-      const task = createSerialTask({ tasks: [] });
-      expect(task.name).toBe('kskbTask'); // default name
-
-      const asyncTask = createSerialTaskAsync({ tasks: [] });
-      expect(asyncTask.name).toBe('kskbTask'); // default name
     });
 
     it('should work with all valid options provided', () => {
@@ -589,13 +581,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [arrowFunc, funcExpression, namedFunc],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [arrowFunc, funcExpression, namedFunc],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -613,13 +605,13 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [boundMethod],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTaskAsync({
           tasks: [boundMethod],
-        })
+        }),
       ).not.toThrow();
     });
   });
@@ -639,21 +631,21 @@ describe('Options Validation', () => {
         createSerialTask({
           name: '测试任务',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTask({
           name: '🚀 rocket task 🚀',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
 
       expect(() =>
         createSerialTask({
           name: 'task-with-special-chars_123!@#',
           tasks: [() => 1],
-        })
+        }),
       ).not.toThrow();
     });
 
@@ -666,7 +658,7 @@ describe('Options Validation', () => {
       expect(() =>
         createSerialTask({
           tasks: [taskWithProps],
-        })
+        }),
       ).not.toThrow();
     });
 

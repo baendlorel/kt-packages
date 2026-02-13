@@ -21,6 +21,7 @@ pnpm add serial-task
 ## 🎯 Quick Start
 
 > Note: For async functions(tasks/resultWrapper/conditions), use `createSerialTaskAsync` instead.
+> Note: Relies on native `Promise.try` for async tasks, which is currently only supported in Node.js 20+ and modern browsers. For older environments, consider using a polyfill or transpiler that supports this feature.
 
 ```typescript
 import { createSerialTask } from 'serial-task';
@@ -62,8 +63,7 @@ Creates a sync/async serial task function.
   - **skipCondition?**: `function` - Function that determines when to skip a task (default: `() => false`)
   - **resultWrapper?**: `function` - Function that transforms input between tasks, default(means the first task gets original args, subsequent tasks get the last return value):
   ```ts
-  (_task: Fn, index: number, _tasks: Fn[], args: unknown[], lastReturn: unknown) =>
-    index === 0 ? args : [lastReturn];
+  (_task: Fn, index: number, _tasks: Fn[], args: unknown[], lastReturn: unknown) => (index === 0 ? args : [lastReturn]);
   ```
 
 #### Returns
@@ -312,6 +312,7 @@ const dynamicTask = createSerialTask({
 ## 🔄 Async Support
 
 For async functions, use `createSerialTaskAsync`:
+`createSerialTaskAsync` uses native `Promise.try`.
 
 ```typescript
 import { createSerialTaskAsync } from 'serial-task';

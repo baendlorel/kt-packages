@@ -1,6 +1,5 @@
 import { Fn, SerialTaskOptions, TaskifyAsync, TaskReturn } from './global.js';
 import { defineProperty, normalize } from './common.js';
-import { PromiseTrapply, PromiseTry } from './promise-try.js';
 
 /**
  * ## Usage
@@ -47,21 +46,21 @@ export function createSerialTaskAsync<F extends Fn>(opts: SerialTaskOptions<F>):
     for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i] as F;
 
-      const input = await PromiseTry(resultWrapper, null, task, i, tasks, args, last);
+      const input = (await Promise.try(resultWrapper as any, task, i, tasks, args, last)) as Parameters<F>;
 
-      const toBreak = await PromiseTry(breakCondition, null, task, i, tasks, args, last);
+      const toBreak = await Promise.try(breakCondition as any, task, i, tasks, args, last);
       if (toBreak) {
         breakAt = i;
         break; // end this task
       }
 
-      const toSkip = await PromiseTry(skipCondition, null, task, i, tasks, args, last);
+      const toSkip = await Promise.try(skipCondition as any, task, i, tasks, args, last);
       if (toSkip) {
         skipped.push(i);
         continue; // skip this task
       }
 
-      last = await PromiseTrapply(task, null, input);
+      last = (await Promise.try(task as (...args: Parameters<F>) => R, ...input)) as R;
       results[i] = last;
     }
 

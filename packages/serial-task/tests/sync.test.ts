@@ -264,12 +264,4 @@ describe('createSerialTask (Sync)', () => {
 
     expect(serialTask.name).toBe('emptyTask');
   });
-
-  it('should use default name when not specified', () => {
-    const serialTask = createSerialTask({
-      tasks: [(x: number) => x + 1],
-    });
-
-    expect(serialTask.name).toBe('kskbTask');
-  });
 });

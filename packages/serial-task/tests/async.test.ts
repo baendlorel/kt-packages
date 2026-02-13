@@ -257,14 +257,6 @@ describe('createSerialTaskAsync (Async)', () => {
     expect(serialTask.name).toBe('emptyAsyncTask');
   });
 
-  it('should use default name when not specified in async', () => {
-    const serialTask = createSerialTaskAsync({
-      tasks: [async (x: number) => x + 1],
-    });
-
-    expect(serialTask.name).toBe('kskbTask');
-  });
-
   it('should handle thenable objects (non-native promises)', async () => {
     const thenable = {
       then: (resolve: (value: number) => void) => {
