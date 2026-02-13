@@ -22,7 +22,8 @@ export async function publish(who: string | undefined) {
 
   const env = { ...process.env, LIB_PACKAGE_PATH: info.path };
   execSync(`rollup -c rollup.config.ts --configPlugin typescript`, { stdio: 'inherit', env });
-  execSync(`pnpm --filter ${info.name} publish --no-git-checks --access public`, { stdio: 'inherit', env });
+  execSync(`npm publish ${info.path} --access public`, { stdio: 'inherit', cwd: info.path });
+
   console.log(`Published ${info.name}@${currentVersionStr}`);
 
   const tagExists = execSync(`git tag -l "${tagName}"`, { encoding: 'utf-8' }).trim().length > 0;
@@ -37,9 +38,9 @@ export async function publish(who: string | undefined) {
   console.log(`Bumped ${info.name} to version ${nextVersionStr}`);
 
   execSync(`git add "${info.jsonPath}"`, { stdio: 'inherit' });
-  execSync(`git commit -m "chore(release): bump ${info.name} to ${nextVersionStr}"`, { stdio: 'inherit' });
+  execSync(`git commit -m "release: bump ${info.name} to ${nextVersionStr}"`, { stdio: 'inherit' });
   console.log(`Committed version bump and finished release flow.`);
 
-  // pnpm --filter @ktjs/router build && pnpm --filter @ktjs/router publish --no-git-checks --access public
-  // pnpm --filter @ktjs/example dev  --no-git-checks
+  // release example:
+  // pnpm pub bind-params
 }
