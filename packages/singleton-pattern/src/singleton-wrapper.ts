@@ -1,3 +1,5 @@
+import type { ProxiedClass, Class, SingletonifyOptions } from './global.js';
+
 const proxiedToTarget = new WeakMap<ProxiedClass, Class>();
 const targetToProxied = new WeakMap<Class, ProxiedClass>();
 

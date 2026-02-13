@@ -1,7 +1,7 @@
-type Class = new (...args: any[]) => any;
-type ProxiedClass = new (...args: any[]) => any;
+export type Class = new (...args: any[]) => any;
+export type ProxiedClass = new (...args: any[]) => any;
 
-interface SingletonifyOptions {
+export interface SingletonifyOptions {
   /**
    * Preventing the `.prototype.constructor` from being accessed
    *
