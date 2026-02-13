@@ -1,5 +1,9 @@
 **/build/
 **/prebuilds/
+packages/**/node_modules/
+packages/**/dist/
+packages/**/build/
+packages/**/prebuilds/
 
 
 # Logs
