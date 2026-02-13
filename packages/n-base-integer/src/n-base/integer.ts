@@ -1,5 +1,5 @@
 import { MAX_BASE, CLASS_NAME, Flag } from './consts.js';
-import { chs, unshift0 } from './common.js';
+import { chs } from './common.js';
 import { expect, expectPrivateCalling } from './expect.js';
 import { safeBase, safeCharset, safeInt } from './safe.js';
 
@@ -146,44 +146,67 @@ const minus = (a: readonly number[], b: readonly number[], base: number): number
   return purgeZeros(diff);
 };
 
-// todo 优化减少内存占用，为atob
 const multiply = (a: readonly number[], b: readonly number[], base: number): number[] => {
-  const rows: number[][] = [];
-  let maxRowLen = 0;
-  for (let i = 0; i < a.length; i++) {
-    const row: number[] = new Array(i); // create a row for the result
-    row.fill(0); // fill with zeros
-    rows.push(row);
-    let carry = 0;
-    const ai = a[i];
-    for (let j = 0; j < b.length; j++) {
-      const v = ai * b[j] + carry;
-      row.push(v % base); // store the result in b
-      carry = Math.floor(v / base); // calculate the carry
-    }
-    if (carry > 0) {
-      row.push(carry);
-    }
-    maxRowLen = Math.max(maxRowLen, row.length);
+  if (isZero(a) || isZero(b)) {
+    return [0];
   }
 
-  // add all rows together
-  const result: number[] = [];
-  {
-    let carry = 0;
-    for (let i = 0; i < maxRowLen; i++) {
-      let v = carry;
-      for (let j = 0; j < rows.length; j++) {
-        v += rows[j][i] ?? 0;
-      }
-      carry = Math.floor(v / base);
-      result[i] = v % base;
+  if (a.length < b.length) {
+    const temp = a;
+    a = b;
+    b = temp;
+  }
+
+  const result: number[] = new Array(a.length + b.length + 1).fill(0);
+  for (let i = 0; i < a.length; i++) {
+    const ai = a[i];
+    if (ai === 0) {
+      continue;
     }
-    if (carry > 0) {
-      result.push(carry);
+
+    let carry = 0;
+    for (let j = 0; j < b.length; j++) {
+      const at = i + j;
+      const v = result[at] + ai * b[j] + carry;
+      carry = Math.floor(v / base);
+      result[at] = v - carry * base;
+    }
+
+    let at = i + b.length;
+    while (carry > 0) {
+      const v = result[at] + carry;
+      carry = Math.floor(v / base);
+      result[at] = v - carry * base;
+      at++;
     }
   }
-  purgeZeros(result);
+  return purgeZeros(result);
+};
+
+/**
+ * ! ONLY use when 0 <= b < base.
+ */
+const multiplyByDigit = (a: readonly number[], b: number, base: number): number[] => {
+  if (b === 0 || isZero(a)) {
+    return [0];
+  }
+  if (b === 1) {
+    return a.slice();
+  }
+
+  const result: number[] = new Array(a.length + 1);
+  let carry = 0;
+  for (let i = 0; i < a.length; i++) {
+    const v = a[i] * b + carry;
+    carry = Math.floor(v / base);
+    result[i] = v - carry * base;
+  }
+  if (carry > 0) {
+    result[a.length] = carry;
+    return result;
+  }
+
+  result.length = a.length;
   return result;
 };
 
@@ -212,50 +235,45 @@ const divide = (a: readonly number[], b: readonly number[], base: number): Primi
     return divideSmall(a, b[0], base);
   }
 
-  // move this length to use vertical expression
-
-  const aa = a.slice();
   const quo: number[] = [];
   let carry = [0];
-  do {
-    // one digit at a time
-    const dividend = isZero(carry) ? aa.splice(aa.length - 1, 1) : aa.splice(aa.length - 1, 1).concat(carry);
+  for (let ai = a.length - 1; ai >= 0; ai--) {
+    // one digit at a time from high to low
+    const digit = a[ai];
+    let dividend: number[];
+    if (isZero(carry)) {
+      dividend = [digit];
+    } else {
+      dividend = new Array(carry.length + 1);
+      dividend[0] = digit;
+      for (let i = 0; i < carry.length; i++) {
+        dividend[i + 1] = carry[i];
+      }
+    }
 
     // start from high rank
     switch (cmp(dividend, b)) {
       case Ordering.Equal:
-        // set carry to zero
-        carry.length = 1;
-        carry[0] = 0;
-        quo.unshift(1);
+        carry = [0];
+        quo.push(1);
         break;
       case Ordering.Greater:
         // calculate [...]/[...] or [...,1]/[...]
         {
           const qr = binarySearchQuotient(dividend, b, base);
-          quo.unshift(qr.quotient);
+          quo.push(qr.quotient);
           carry = qr.remainder;
         }
         break;
       case Ordering.Less:
-        unshift0(quo, 1);
-        // & already nothing left but still need to chop
-        if (aa.length === 0) {
-          // if we have no more digits to chop, we are done
-          return {
-            quotient: quo.length === 0 ? [0] : quo,
-            remainder: dividend,
-          };
-        }
-        // chop another digit and try again
+        quo.push(0);
         carry = dividend;
         break;
     }
-  } while (aa.length > 0);
+  }
 
-  // purgeZeros(quo);
-  // purgeZeros(carry);
-  return { quotient: quo, remainder: carry };
+  const quotient = quo.reverse();
+  return { quotient: purgeZeros(quotient), remainder: carry };
 };
 
 /**
@@ -265,11 +283,12 @@ const divide = (a: readonly number[], b: readonly number[], base: number): Primi
  */
 const divideSmall = (a: readonly number[], b: number, base: number): PrimitiveDivResult => {
   let carry = 0;
-  const result: number[] = [];
+  const result: number[] = new Array(a.length);
   for (let i = a.length - 1; i >= 0; i--) {
     const v = a[i] + carry * base;
-    result.unshift(Math.floor(v / b));
-    carry = v % b;
+    const quotient = Math.floor(v / b);
+    result[i] = quotient;
+    carry = v - quotient * b;
   }
   purgeZeros(result);
   return { quotient: result, remainder: [carry] };
@@ -296,7 +315,7 @@ const binarySearchQuotient = (
     // iterate them
     if (upper - lower <= 3) {
       for (let i = lower; i <= upper; i++) {
-        const dividend = multiply(b, [i], base);
+        const dividend = multiplyByDigit(b, i, base);
         const r = minus(a, dividend, base);
         if (cmp(r, b) === Ordering.Less) {
           return { quotient: i, remainder: r };
@@ -306,7 +325,7 @@ const binarySearchQuotient = (
     }
 
     const quo = Math.floor((lower + upper) / 2);
-    const dividend = multiply(b, [quo], base);
+    const dividend = multiplyByDigit(b, quo, base);
     // & must have a >= q and a - q < b
     switch (cmp(a, dividend)) {
       case Ordering.Equal:
