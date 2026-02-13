@@ -32,8 +32,7 @@ export const BooleanConstructor = Boolean;
 export const BigIntConstructor = typeof BigInt !== 'undefined' ? BigInt : undefined;
 
 export const PromiseConstructor = Promise;
-export const SharedArrayBufferConstructor =
-  typeof SharedArrayBuffer !== 'undefined' ? SharedArrayBuffer : undefined;
+export const SharedArrayBufferConstructor = typeof SharedArrayBuffer !== 'undefined' ? SharedArrayBuffer : undefined;
 
 // Buffer is Node.js specific, may not exist in browsers
 export const BufferConstructor = typeof Buffer !== 'undefined' ? Buffer : undefined;
@@ -43,4 +42,3 @@ export const SetAdd = Set.prototype.add;
 export const SetForEach = Set.prototype.forEach;
 export const MapSet = Map.prototype.set;
 export const MapForEach = Map.prototype.forEach;
-export const TypeErr = TypeError;

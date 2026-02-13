@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isPrimitive, expectTargetAndKeys, expectTarget } from './common.js';
 import {
   NumberConstructor,
@@ -34,7 +33,6 @@ import {
   ReflectDeleteProperty,
   ReflectDefineProperty,
   ArrayFromIterator,
-  TypeErr,
 } from './native.js';
 
 interface ReachResult {
@@ -163,11 +161,7 @@ function deepClone(cache: WeakMap<any, any>, o: any): any {
     const TypedArrayConstructor = (o as any).constructor;
     if (o instanceof DataViewConstructor) {
       // DataView needs special handling - copy the underlying buffer and recreate
-      const clonedBuffer = ArrayBufferSlice.call(
-        o.buffer,
-        o.byteOffset,
-        o.byteOffset + o.byteLength
-      );
+      const clonedBuffer = ArrayBufferSlice.call(o.buffer, o.byteOffset, o.byteOffset + o.byteLength);
       return new DataViewConstructor(clonedBuffer);
     } else {
       // TypedArrays can be created from the original array
@@ -210,11 +204,7 @@ const NOT_PROVIDED = Symbol('NOT_PROVIDED');
  * __PKG_INFO__
  */
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export class ReflectDeep extends null {
-  constructor() {
-    throw new TypeErr(`__NAME__ is not a constructor`);
-  }
-
+export namespace ReflectDeep {
   /**
    * Checks if a nested property exists at the given path.
    * @param target - Target object to check.
@@ -226,7 +216,7 @@ export class ReflectDeep extends null {
    * const obj = { a: { b: { c: 'hello' } } };
    * ReflectDeep.has(obj, ['a', 'b', 'c']); // true
    */
-  static has(target: object, propertyKeys: PropertyKey[]): boolean {
+  export const has = (target: object, propertyKeys: PropertyKey[]): boolean => {
     expectTargetAndKeys('has', target, propertyKeys);
 
     let current = target;
@@ -241,7 +231,7 @@ export class ReflectDeep extends null {
       }
     }
     return ReflectHas(current, propertyKeys[propertyKeys.length - 1]);
-  }
+  };
 
   /**
    * Gets the value of a nested property.
@@ -255,11 +245,11 @@ export class ReflectDeep extends null {
    * const obj = { a: { b: { c: 'hello' } } };
    * ReflectDeep.get(obj, ['a', 'b', 'c']); // 'hello'
    */
-  static get<T = any>(
+  export const get = <T = any>(
     target: any,
     propertyKeys: PropertyKey[],
-    receiver: any = NOT_PROVIDED
-  ): T | undefined {
+    receiver: any = NOT_PROVIDED,
+  ): T | undefined => {
     expectTargetAndKeys('get', target, propertyKeys);
 
     let current = target;
@@ -280,7 +270,7 @@ export class ReflectDeep extends null {
         : ReflectGet(current, propertyKeys[propertyKeys.length - 1], receiver);
 
     return result as T | undefined;
-  }
+  };
 
   /**
    * Sets a nested property value, creating intermediate objects as needed.
@@ -296,12 +286,12 @@ export class ReflectDeep extends null {
    * ReflectDeep.set(obj, ['a', 'b', 'c'], 'hello'); // Creates nested structure
    * obj.a.b.c; // 'hello'
    */
-  static set<T = any>(
+  export const set = <T = any>(
     target: any,
     propertyKeys: PropertyKey[],
     value: T,
-    receiver: any = NOT_PROVIDED
-  ): boolean {
+    receiver: any = NOT_PROVIDED,
+  ): boolean => {
     expectTargetAndKeys('set', target, propertyKeys);
 
     let current = target;
@@ -322,7 +312,7 @@ export class ReflectDeep extends null {
     return receiver === NOT_PROVIDED
       ? ReflectSet(current, propertyKeys[propertyKeys.length - 1], value)
       : ReflectSet(current, propertyKeys[propertyKeys.length - 1], value, receiver);
-  }
+  };
 
   /**
    * Traverses a property path and returns the furthest reachable value with its index.
@@ -339,11 +329,7 @@ export class ReflectDeep extends null {
    * ReflectDeep.reach(obj, ['a', 'x']);     // { value: { b: { c: 'hello' } }, index: 0, reached: false }
    * ReflectDeep.reach(obj, ['d', 'x']);     // { value: { a: { b: { c: 'hello' } } }, index: -1, reached: false }
    */
-  static reach(
-    target: object,
-    propertyKeys: PropertyKey[],
-    receiver: any = NOT_PROVIDED
-  ): ReachResult {
+  export const reach = (target: object, propertyKeys: PropertyKey[], receiver: any = NOT_PROVIDED): ReachResult => {
     expectTargetAndKeys('reach', target, propertyKeys);
 
     let current = target;
@@ -369,7 +355,7 @@ export class ReflectDeep extends null {
 
     // Should not reach here, but just in case
     return { value: current, index: -1, reached: false };
-  }
+  };
 
   /**
    * Creates a deep clone of an object, handling circular references and various JS types.
@@ -384,9 +370,9 @@ export class ReflectDeep extends null {
    * const cloned = ReflectDeep.clone(obj);
    * cloned.a.b[2].c = 4; // obj.a.b[2].c is still 3
    */
-  static clone<T = any>(obj: T): T {
+  export const clone = <T = any>(obj: T): T => {
     return deepClone(new WeakMapConstructor(), obj);
-  }
+  };
 
   /**
    * Deletes a nested property at the given path.
@@ -405,7 +391,7 @@ export class ReflectDeep extends null {
    * ReflectDeep.deleteProperty(obj, ['a', 'b', 'c']); // true
    * obj.a.b; // { d: 'world' }
    */
-  static deleteProperty(target: object, propertyKeys: PropertyKey[]): boolean {
+  export const deleteProperty = (target: object, propertyKeys: PropertyKey[]): boolean => {
     expectTargetAndKeys('deleteProperty', target, propertyKeys);
 
     let current = target;
@@ -421,7 +407,7 @@ export class ReflectDeep extends null {
     }
 
     return ReflectDeleteProperty(current, propertyKeys[propertyKeys.length - 1]);
-  }
+  };
 
   /**
    * Defines a nested property with the given descriptor, creating intermediate objects as needed.
@@ -443,11 +429,11 @@ export class ReflectDeep extends null {
    *   set(v) { this._value = v; }
    * });
    */
-  static defineProperty(
+  export const defineProperty = (
     target: object,
     propertyKeys: PropertyKey[],
-    descriptor: PropertyDescriptor
-  ): boolean {
+    descriptor: PropertyDescriptor,
+  ): boolean => {
     expectTargetAndKeys('defineProperty', target, propertyKeys);
 
     let current = target;
@@ -465,7 +451,7 @@ export class ReflectDeep extends null {
     }
 
     return ReflectDefineProperty(current, propertyKeys[propertyKeys.length - 1], descriptor);
-  }
+  };
 
   /**
    * Gets all property keys (including symbols) from the target object and its prototype chain.
@@ -486,7 +472,7 @@ export class ReflectDeep extends null {
    * child.childProp = 'child';
    * ReflectDeep.keys(child); // ['childProp', 'parentProp', 'toString', ...]
    */
-  static keys<T extends object>(target: T): (string | symbol)[] {
+  export const keys = <T extends object>(target: T): (string | symbol)[] => {
     expectTarget('keys', target);
 
     const keySet = new SetConstructor(ReflectOwnKeys(target));
@@ -504,7 +490,7 @@ export class ReflectDeep extends null {
         return ArrayFromIterator(keySet);
       }
     }
-  }
+  };
 
   /**
    * Gets property keys grouped by prototype layer, preserving the prototype chain structure.
@@ -532,7 +518,7 @@ export class ReflectDeep extends null {
    * // layers[1] = { keys: ['parentProp'], object: Parent.prototype }
    * // layers[2] = { keys: ['toString', ...], object: Object.prototype }
    */
-  static groupedKeys<T extends object>(target: T): GroupedKey[] {
+  export const groupedKeys = <T extends object>(target: T): GroupedKey[] => {
     expectTarget('groupedKeys', target);
 
     const keys: GroupedKey[] = [{ keys: ReflectOwnKeys(target), object: target }];
@@ -548,5 +534,5 @@ export class ReflectDeep extends null {
       });
       proto = ReflectGetPrototypeOf(proto);
     }
-  }
+  };
 }
