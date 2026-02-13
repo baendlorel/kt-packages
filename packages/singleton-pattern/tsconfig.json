@@ -1,16 +1,16 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "declaration": false, // false to let rollup handle it
-    "esModuleInterop": true,
-    "strict": true,
-    "outDir": "dist",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@singleton-pattern/*": [
+        "src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

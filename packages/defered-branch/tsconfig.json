@@ -1,9 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "baseUrl": ".",
     "paths": {
-      "@defered-branch/*": ["src/*"]
+      "@defered-branch/*": [
+        "src/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

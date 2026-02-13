@@ -5,8 +5,12 @@
     "moduleResolution": "nodenext",
     "baseUrl": ".",
     "paths": {
-      "@bind-params/*": ["src/*"]
+      "@bind-params/*": [
+        "src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

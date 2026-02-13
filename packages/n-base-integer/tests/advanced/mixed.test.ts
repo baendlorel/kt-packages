@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NBaseInteger } from '@n-base-integer/index.js';
+import { NBaseInteger } from '../../src/index.js';
 
 describe('NBaseInteger 链式四则混合运算', () => {
   it('加减乘除链式调用', () => {

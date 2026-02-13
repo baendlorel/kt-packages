@@ -1,9 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "baseUrl": ".",
     "paths": {
-      "@concat-arr/*": ["src/*"]
+      "@concat-arr/*": [
+        "src/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

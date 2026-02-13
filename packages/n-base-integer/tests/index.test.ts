@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { NBaseInteger } from '@n-base-integer/index.js';
+import { NBaseInteger } from '../src/index.js';
 // Test for NBaseInteger and toString
 
 describe('NBaseInteger', () => {
