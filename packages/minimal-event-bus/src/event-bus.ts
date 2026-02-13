@@ -11,7 +11,6 @@ type AnyFn = (...args: any[]) => any;
 export class EventBus<T extends Record<string, AnyFn>> {
   /**
    * Create an EventBus instance and return its methods bound to it.
-   * - Binding is done using wrapper functions to avoid performance loss from `Function.prototype.bind`.
    */
   public static create<T extends Record<string, AnyFn>>() {
     const bus = new EventBus<T>();
@@ -47,20 +46,6 @@ export class EventBus<T extends Record<string, AnyFn>> {
   private _cleanList = new Set<AnyFn>();
 
   /**
-   * @internal
-   */
-  private _getListeners(event: keyof T): T[keyof T][] {
-    const listeners = this._listeners.get(event);
-    if (listeners) {
-      return listeners;
-    } else {
-      const temp: T[keyof T][] = [];
-      this._listeners.set(event, temp);
-      return temp;
-    }
-  }
-
-  /**
    * Register a listener for the given event
    * - one function can be registered multiple times, and will be called multiple times.
    * @param event event name string
@@ -70,7 +55,11 @@ export class EventBus<T extends Record<string, AnyFn>> {
    * - be aware that the index is not always
    */
   on<K extends keyof T>(event: K, listener: T[K], limit?: number): number {
-    const listeners = this._getListeners(event);
+    let listeners = this._listeners.get(event);
+    if (!listeners) {
+      listeners = [];
+      this._listeners.set(event, listeners);
+    }
     if (!limit) {
       return listeners.push(listener) - 1;
     }
@@ -140,7 +129,7 @@ export class EventBus<T extends Record<string, AnyFn>> {
     // clean the listeners that have reached their limit after execution
     this._listeners.set(
       event,
-      listeners.filter((fn) => !this._cleanList.has(fn))
+      listeners.filter((fn) => !this._cleanList.has(fn)),
     );
 
     this._cleanList.clear();

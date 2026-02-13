@@ -5,12 +5,8 @@
     "moduleResolution": "nodenext",
     "baseUrl": ".",
     "paths": {
-      "@minimal-event-bus/*": [
-        "src/*"
-      ]
+      "@minimal-event-bus/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }
