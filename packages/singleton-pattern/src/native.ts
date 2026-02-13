@@ -1,5 +1,3 @@
-export const SetPrototypeOf = Reflect.setPrototypeOf;
-export const DefineProperty = Reflect.defineProperty;
-export const Get = Reflect.get;
-export const ProxyConstruct = Proxy;
-export const ObjectContruct = Object;
+export const $setPrototypeOf = Reflect.setPrototypeOf;
+export const $define = Reflect.defineProperty;
+export const $get = Reflect.get;

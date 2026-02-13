@@ -1,18 +1,16 @@
-import { ObjectContruct, ProxyConstruct } from './native.js';
-
 class Singletonify {
   private readonly p2c = new WeakMap<ProxiedClass, Class>();
   private readonly c2p = new WeakMap<Class, ProxiedClass>();
 
   singletonify<T extends Class>(target: T, options?: SingletonifyOptions): T {
-    const { changeProtoConstructor = true, onlyOnce = true } = ObjectContruct(options);
+    const { changeProtoConstructor = true, onlyOnce = true } = Object(options);
 
     if (onlyOnce && this.c2p.has(target)) {
       return this.c2p.get(target) as T;
     }
 
     let instance: any;
-    const proxied = new ProxyConstruct(target, {
+    const proxied = new Proxy(target, {
       construct(cls, args) {
         if (!instance) {
           instance = new cls(...args);
