@@ -7,15 +7,10 @@ function loadNative() {
   // 优先尝试 build/Release
   try {
     return require('../build/Release/function_feature.node');
-  } catch (e) {
+  } catch {
     // 自动查找 prebuilds 下的 ABI 文件
     const abi = process.versions.modules;
-    const prebuildPath = join(
-      '..',
-      'prebuilds',
-      `${platform()}-${arch()}`,
-      `function-feature.abi${abi}.node`
-    );
+    const prebuildPath = join('..', 'prebuilds', `${platform()}-${arch()}`, `function-feature.abi${abi}.node`);
     return require(prebuildPath);
   }
 }

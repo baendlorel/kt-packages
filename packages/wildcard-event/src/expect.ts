@@ -54,7 +54,7 @@ class UntypedExpect extends Function {
       throw new E(`'identifier' cannot start or end with '.'`);
     }
 
-    if (/[\*]{3,}/g.test(raw)) {
+    if (/[*]{3,}/g.test(raw)) {
       throw new E(`'identifier' cannot have more than two '*' in a row`);
     }
 
@@ -80,7 +80,7 @@ class UntypedExpect extends Function {
     }
 
     // normalize multiple '**' to single '*'
-    const name = raw.replace(/[\*]{2,}/g, '*');
+    const name = raw.replace(/[*]{2,}/g, '*');
 
     // rule: must has '.' before or after '*'
     // & after assertions above, name could not be only '*' or '**' shrunk to '*'
