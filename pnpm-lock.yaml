@@ -108,6 +108,9 @@ importers:
       acorn:
         specifier: ^8.15.0
         version: 8.15.0
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
 
   packages/rollup-plugin-const-enum:
     devDependencies:
@@ -241,58 +244,6 @@ importers:
       acorn-walk:
         specifier: ^8.3.4
         version: 8.3.4
-    devDependencies:
-      '@rollup/plugin-alias':
-        specifier: ^5.1.1
-        version: 5.1.1(rollup@4.57.1)
-      '@rollup/plugin-commonjs':
-        specifier: ^28.0.6
-        version: 28.0.9(rollup@4.57.1)
-      '@rollup/plugin-node-resolve':
-        specifier: ^16.0.1
-        version: 16.0.3(rollup@4.57.1)
-      '@rollup/plugin-replace':
-        specifier: ^6.0.2
-        version: 6.0.3(rollup@4.57.1)
-      '@rollup/plugin-terser':
-        specifier: ^0.4.4
-        version: 0.4.4(rollup@4.57.1)
-      '@rollup/plugin-typescript':
-        specifier: ^12.1.4
-        version: 12.3.0(rollup@4.57.1)(tslib@2.8.1)(typescript@5.9.3)
-      '@types/node':
-        specifier: ^24.5.2
-        version: 24.10.13
-      '@vitest/coverage-v8':
-        specifier: ^3.2.4
-        version: 3.2.4(vitest@3.2.4(@types/node@24.10.13)(terser@5.46.0)(tsx@4.21.0))
-      oxlint:
-        specifier: ^1.17.0
-        version: 1.47.0
-      prettier:
-        specifier: ^3.6.2
-        version: 3.8.1
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.2
-      rollup:
-        specifier: ^4.52.2
-        version: 4.57.1
-      rollup-plugin-dts:
-        specifier: ^6.2.3
-        version: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
-      rollup-plugin-dts-merger:
-        specifier: ^2.0.0
-        version: 2.0.0(rollup@4.57.1)
-      tslib:
-        specifier: ^2.8.1
-        version: 2.8.1
-      typescript:
-        specifier: ^5.9.2
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.4
-        version: 3.2.4(@types/node@24.10.13)(terser@5.46.0)(tsx@4.21.0)
 
   packages/rollup-plugin-inline-function:
     dependencies:
@@ -3692,14 +3643,6 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@24.10.13)(terser@5.46.0)(tsx@4.21.0))':
-    dependencies:
-      '@vitest/spy': 3.2.4
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 7.3.1(@types/node@24.10.13)(terser@5.46.0)(tsx@4.21.0)
-
   '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@25.2.3)(terser@5.46.0)(tsx@4.21.0))':
     dependencies:
       '@vitest/spy': 3.2.4
@@ -4780,7 +4723,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@24.10.13)(terser@5.46.0)(tsx@4.21.0))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.2.3)(terser@5.46.0)(tsx@4.21.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4

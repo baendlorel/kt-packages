@@ -14,11 +14,13 @@ export class IfParser {
   private readonly _opts: RollupConditionalCompilationOptions;
   private readonly _keys: string[] = [];
   private readonly _values: any[] = [];
+  private readonly _expressionCache = new Map<string, (...args: any[]) => unknown>();
   constructor(_opts: Partial<RollupConditionalCompilationOptions>) {
     this._opts = {
       variables: _opts.variables ?? {},
       sourceType: _opts.sourceType ?? 'module',
       ecmaVersion: _opts.ecmaVersion ?? 'latest',
+      expressionCache: _opts.expressionCache ?? true,
     };
     const kv = Object.entries(this._opts.variables);
     for (let i = 0; i < kv.length; i++) {
@@ -50,7 +52,7 @@ export class IfParser {
     const blocks: DirvBlock[] = [];
     const toBlock: typeof this.tryParseToBlock = (r, s, e) => this.tryParseToBlock(r, s, e);
 
-    acorn.parse(code, {
+    const tokenizer = acorn.tokenizer(code, {
       ecmaVersion: this._opts.ecmaVersion,
       sourceType: this._opts.sourceType,
       /**
@@ -68,6 +70,8 @@ export class IfParser {
         b && blocks.push(b);
       },
     });
+
+    while (tokenizer.getToken().type !== acorn.tokTypes.eof) {}
     return blocks;
   }
 
@@ -76,30 +80,19 @@ export class IfParser {
    * @param raw trimmed comment text
    */
   private tryParseToBlock(raw: string, start: number, end: number): DirvBlock | null {
-    raw = raw.replace(/(^|\n)[*\s]+/g, '');
-    let dirv = null as Dirv | null;
-    const expr = raw.replace(REGEX, (_, $1: Dirv) => ((dirv = $1), '')).trim();
-    if (dirv === null) {
+    const normalized = raw.replace(/(^|\n)[*\s]+/g, '').trimStart();
+    if (!normalized.startsWith('#')) {
       return null;
     }
 
-    let condition: boolean;
-    switch (dirv) {
-      case Dirv.If:
-      case Dirv.Elif:
-        condition = this.evaluate(expr);
-        break;
-      case Dirv.Else:
-        condition = true;
-        break;
-      case Dirv.Endif:
-        condition = false;
-        break;
-      default:
-        throw new Error(cdcp_error.unexpected_directive.replace('$0', String(dirv)));
+    const matched = normalized.match(REGEX);
+    if (!matched) {
+      return null;
     }
 
-    return { dirv, condition, start, end };
+    const dirv = matched[1] as Dirv;
+    const expr = normalized.slice(matched[0].length).trim();
+    return { dirv, expr, start, end };
   }
 
   toIfBlocks(blocks: DirvBlock[]): IfBlock[] {
@@ -124,25 +117,23 @@ export class IfParser {
 
     const addIfBlock = (b: DirvBlock, last?: IfBlock): void => {
       let condition: boolean | null = true;
+      const parent = stack[stack.length - 1];
+      const parentActive = parent ? parent.condition === true : true;
 
       if (b.dirv === Dirv.If) {
-        condition = b.condition;
+        condition = parentActive ? this.evaluate(b.expr) : false;
 
         // * Since #endif won't call this function, we can directly use 'else' here
         // `last` here is always truthy because only #if enteres will no `last` needed
       } else {
         if (!last) throw new Error(cdcp_error.internal_last_required);
 
-        // * Here, last IfBlock can only be #if or #elif.
-        // - if last is #else, it will be blocked by 'cdcp_error.syntax_no_else_or_elif_after_else' check above
-        // - if last is #endif, it will not have been passed in here
-        if (last.condition === true) {
-          condition = null;
-        } else if (last.condition === null) {
-          // null should propagate down the #elif/#else chain
+        if (!parentActive) {
+          condition = false;
+        } else if (last.condition === true || last.condition === null) {
           condition = null;
         } else {
-          condition = !last.condition && b.condition;
+          condition = b.dirv === Dirv.Else ? true : this.evaluate(b.expr);
         }
       }
 
@@ -259,8 +250,8 @@ export class IfParser {
    * & Most imaginative part
    */
   evaluate(expr: string): boolean {
-    const fn = new Function(...this._keys, `return (${expr})`);
     try {
+      const fn = this.resolveExpressionFn(expr);
       const result = fn(...this._values);
       return Boolean(result);
     } catch (e) {
@@ -268,5 +259,24 @@ export class IfParser {
         cdcp_error.expr_error.replace('$0', expr).replace('$1', e instanceof Error ? e.message : String(e)),
       );
     }
+  }
+
+  private resolveExpressionFn(expr: string): (...args: any[]) => unknown {
+    if (!this._opts.expressionCache) {
+      return this.compileExpression(expr);
+    }
+
+    const cached = this._expressionCache.get(expr);
+    if (cached) {
+      return cached;
+    }
+
+    const compiled = this.compileExpression(expr);
+    this._expressionCache.set(expr, compiled);
+    return compiled;
+  }
+
+  private compileExpression(expr: string): (...args: any[]) => unknown {
+    return new Function(...this._keys, `return (${expr})`) as (...args: any[]) => unknown;
   }
 }

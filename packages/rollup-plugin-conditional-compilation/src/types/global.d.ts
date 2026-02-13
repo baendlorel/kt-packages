@@ -18,6 +18,12 @@ export interface RollupConditionalCompilationOptions {
    * - default: 'latest'
    */
   ecmaVersion: acorn.ecmaVersion;
+
+  /**
+   * Cache compiled expression functions by expression string.
+   * - default: true
+   */
+  expressionCache: boolean;
 }
 
 export interface IfBlock {
@@ -32,11 +38,7 @@ export interface IfBlock {
 
 export interface DirvBlock {
   dirv: Dirv;
-
-  /**
-   * When `dirv` is `#endif`, `condition` is meaningless (always `false`).
-   */
-  condition: boolean;
+  expr: string;
 
   start: number;
 

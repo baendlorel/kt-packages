@@ -5,7 +5,7 @@ import { loadjs } from './setup.js';
 
 describe('IfParser getBlocks and collect', () => {
   it('getBlocks should return two directive blocks for a simple #if / #endif', () => {
-    const opts = { variables: { DEBUG: true } } as any;
+    const opts = { variables: { DEBUG: true } };
     const parser = new IfParser(opts);
 
     const code = `// #if DEBUG
@@ -20,16 +20,16 @@ console.log('inside');
     const endifBlock = blocks[1];
 
     expect(ifBlock.dirv).toBe('#if');
-    expect(ifBlock.condition).toBe(true);
+    expect(ifBlock.expr).toBe('DEBUG');
     expect(typeof ifBlock.start).toBe('number');
     expect(typeof ifBlock.end).toBe('number');
 
     expect(endifBlock.dirv).toBe('#endif');
-    expect(endifBlock.condition).toBe(false);
+    expect(endifBlock.expr).toBe('');
   });
 
   it('collect should produce nested IfBlock tree for nested directives', () => {
-    const opts = { variables: { OUT: true, IN: true } } as any;
+    const opts = { variables: { OUT: true, IN: true } };
     const parser = new IfParser(opts);
 
     const code = `// #if OUT
@@ -64,37 +64,30 @@ inner();
 
   it('collect multiple and nested if blocks correctly', () => {
     const content = loadjs('case5.js');
-    const opts = { variables: { A: true, B: false, C: true } } as any;
+    const opts = { variables: { A: true, B: false, C: true } };
     const parser = new IfParser(opts);
 
     const dirvBlocks = parser.toDirvBlocks(content);
     const ifBlocks = parser.toIfBlocks(dirvBlocks);
 
     expect(dirvBlocks.length).toBe(10);
-    expect(dirvBlocks).toMatchObject([
-      { dirv: Dirv.If, condition: false },
-      { dirv: Dirv.If, condition: true },
-      { dirv: Dirv.Endif },
-      { dirv: Dirv.If, condition: true },
-      { dirv: Dirv.Endif },
-      { dirv: Dirv.Endif },
-      { dirv: Dirv.If, condition: true },
-      { dirv: Dirv.If, condition: true },
-      { dirv: Dirv.Endif },
-      { dirv: Dirv.Endif },
+    expect(dirvBlocks.map((block) => block.dirv)).toEqual([
+      Dirv.If,
+      Dirv.If,
+      Dirv.Endif,
+      Dirv.If,
+      Dirv.Endif,
+      Dirv.Endif,
+      Dirv.If,
+      Dirv.If,
+      Dirv.Endif,
+      Dirv.Endif,
     ]);
 
     expect(ifBlocks.length).toBe(2);
-    expect(ifBlocks).toMatchObject([
-      {
-        condition: false,
-        children: [
-          { condition: true, children: [] },
-          { condition: true, children: [] },
-        ],
-      },
-      { condition: true, children: [{ condition: true, children: [] }] },
-    ]);
-    console.log(ifBlocks);
+    expect(ifBlocks[0].condition).toBe(false);
+    expect(ifBlocks[0].children).toMatchObject([{ condition: false }, { condition: false }]);
+    expect(ifBlocks[1].condition).toBe(true);
+    expect(ifBlocks[1].children).toMatchObject([{ condition: true }]);
   });
 });

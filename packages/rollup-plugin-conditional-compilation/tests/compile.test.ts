@@ -71,7 +71,7 @@ describe('IfParser final compile', () => {
     const opts = { variables: { D: true, A: true } } as any;
     const parser = new IfParser(opts);
 
-    expect(() => parser.toDirvBlocks(code)).toThrow();
+    expect(() => parser.proceed(code)).toThrow();
   });
 
   it('case9 handle else', () => {

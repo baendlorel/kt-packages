@@ -691,7 +691,7 @@ describe('Advanced if/elif/else compilation tests', () => {
       expect(() => parser.proceed(code)).toThrow(/[Uu]nmatched.*#elif/);
     });
 
-    it('case16: should throw on malformed expression in elif', () => {
+    it('case16: should skip malformed elif expression when previous branch already matched', () => {
       const code = loadjs('case16.js');
       const parser = new IfParser({
         variables: { VALID: true, BROKEN: true },
@@ -699,7 +699,9 @@ describe('Advanced if/elif/else compilation tests', () => {
         ecmaVersion: 'latest',
       });
 
-      expect(() => parser.proceed(code)).toThrow();
+      const result = parser.proceed(code);
+      expect(codeOf(result)).toContain("console.log('valid');");
+      expect(codeOf(result)).not.toContain("console.log('broken-elif');");
     });
 
     it('case17: should handle multiple else blocks (parser converts to if-blocks)', () => {

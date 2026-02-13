@@ -41,7 +41,10 @@ export default {
   plugins: [
     // Recommended: run `conditional` before the TypeScript transformer so the
     // plugin operates on the original source comments.
-    conditional({ variables: { DEBUG: false, FEATURE_X: true } }),
+    conditional({
+      variables: { DEBUG: false, FEATURE_X: true },
+      expressionCache: true, // default true
+    }),
     typescript({
       ...,
       removeComments: false, // !!IMPORTANT!! Don't strip comments so quickly!
@@ -90,6 +93,7 @@ console.log('always');
   - Reason 1: block comments can span multiple lines with `*` ahead and may contain nested comments, making parsing more complex and error-prone.
   - Reason 2: For consistency and simplicity.
 - **Precise Evaluation**: Expressions are executed using the Function constructor — do not pass untrusted input or rely on side effects.
+- **Expression Cache**: By default, compiled expression functions are cached by expression string (`expressionCache: true`).
 
 ## License
 

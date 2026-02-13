@@ -49,7 +49,7 @@ function normalize(options: Partial<RollupConditionalCompilationOptions>): Rollu
     throw new Error(`Invalid options: '${options}', must be an object`);
   }
 
-  const { variables = {}, ecmaVersion = 'latest', sourceType = 'module' } = options;
+  const { variables = {}, ecmaVersion = 'latest', sourceType = 'module', expressionCache = true } = options;
 
   if (typeof variables !== 'object' || variables === null) {
     throw new Error(`Invalid variables: '${variables}', must be an object`);
@@ -60,8 +60,12 @@ function normalize(options: Partial<RollupConditionalCompilationOptions>): Rollu
   }
 
   if (!Consts.SourceType.split(',').includes(sourceType)) {
-    throw new Error(`Invalid sourceType: '${ecmaVersion}', must be one of ${Consts.SourceType}`);
+    throw new Error(`Invalid sourceType: '${sourceType}', must be one of ${Consts.SourceType}`);
   }
 
-  return { variables, ecmaVersion, sourceType };
+  if (typeof expressionCache !== 'boolean') {
+    throw new Error(`Invalid expressionCache: '${expressionCache}', must be a boolean`);
+  }
+
+  return { variables, ecmaVersion, sourceType, expressionCache };
 }
