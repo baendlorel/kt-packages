@@ -61,6 +61,7 @@ export const getPackageInfo = (who: string | undefined) => {
     version: new Version(packageJson.version),
     json: packageJson,
     name: packageJson.name as string,
+    env: { ...process.env, LIB_PACKAGE_PATH: packagePath },
   };
 };
 

@@ -20,8 +20,7 @@ export async function publish(who: string | undefined) {
     return;
   }
 
-  const env = { ...process.env, LIB_PACKAGE_PATH: info.path };
-  execSync(`rollup -c rollup.config.ts --configPlugin typescript`, { stdio: 'inherit', env });
+  execSync(`rollup -c rollup.config.ts --configPlugin typescript`, { stdio: 'inherit', env: info.env });
   execSync(`npm publish ${info.path} --access public`, { stdio: 'inherit', cwd: info.path });
 
   console.log(`Published ${info.name}@${currentVersionStr}`);

@@ -4,14 +4,9 @@ import { getPackageInfo } from './common/package-info.js';
 
 export async function test(who: string | undefined) {
   const info = getPackageInfo(who);
-  const env = { ...process.env, LIB_PACKAGE_PATH: dirname(info.jsonPath) };
 
   const vitestConfigPath = resolve('vitest.config.ts');
   const testPackageDir = resolve(info.jsonPath, '..', 'tests');
 
-  if (info.json.scripts?.test) {
-    execSync(`vitest ${testPackageDir} --config ${vitestConfigPath}`, { stdio: 'inherit', env });
-  } else {
-    console.warn(`Package ${info.name} has no test script, skipping...`);
-  }
+  execSync(`vitest ${testPackageDir} --config ${vitestConfigPath}`, { stdio: 'inherit', env: info.env });
 }

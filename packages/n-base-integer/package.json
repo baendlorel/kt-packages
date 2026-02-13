@@ -31,15 +31,6 @@
 		"typescript",
 		"javascript"
 	],
-	"scripts": {
-		"test": "clear & jest",
-		"lint": "eslint .",
-		"plugin": "tsc -p tsconfig.plugin.json",
-		"build": "rimraf dist && pnpm plugin && rollup -c"
-	},
-	"peerDependencies": {
-		"jest": "^30.0.0"
-	},
 	"devDependencies": {},
 	"license": "MIT"
 }
