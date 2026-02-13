@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { IfParser } from '../src/compiler/parser.js';
+import { Dirv } from '../src/compiler/consts.js';
+import { loadjs } from './setup.js';
 
 describe('IfParser getBlocks and collect', () => {
   it('getBlocks should return two directive blocks for a simple #if / #endif', () => {

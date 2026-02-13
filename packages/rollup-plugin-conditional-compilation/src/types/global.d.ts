@@ -1,55 +1,65 @@
+import * as acorn from 'acorn';
 import type { Dirv } from '../compiler/consts.ts';
-import type { RollupConditionalCompilationOptions } from './common.js';
 
-declare global {
-  type Opts = RollupConditionalCompilationOptions;
+export interface RollupConditionalCompilationOptions {
+  /**
+   * Variables to be used in the expressions `#if` or `#elif`
+   */
+  variables: Record<string, unknown>;
 
-  const enum Consts {
-    EcmaVersions = '3,5,6,7,8,9,10,11,12,13,14,15,16,17,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,latest',
-    SourceType = 'script,module',
-  }
+  /**
+   * Will be passed to Acorn
+   * - default: 'module'
+   */
+  sourceType: 'script' | 'module';
 
-  interface IfBlock {
-    dirv: Dirv;
-    condition: boolean | null;
-    ifStart: number;
-    ifEnd: number;
-    endifStart: number;
-    endifEnd: number;
-    children: IfBlock[];
-  }
+  /**
+   * Will be passed to Acorn
+   * - default: 'latest'
+   */
+  ecmaVersion: acorn.ecmaVersion;
+}
 
-  interface DirvBlock {
-    dirv: Dirv;
+export interface IfBlock {
+  dirv: Dirv;
+  condition: boolean | null;
+  ifStart: number;
+  ifEnd: number;
+  endifStart: number;
+  endifEnd: number;
+  children: IfBlock[];
+}
 
-    /**
-     * When `dirv` is `#endif`, `condition` is meaningless (always `false`).
-     */
-    condition: boolean;
+export interface DirvBlock {
+  dirv: Dirv;
 
-    start: number;
+  /**
+   * When `dirv` is `#endif`, `condition` is meaningless (always `false`).
+   */
+  condition: boolean;
 
-    end: number;
-  }
+  start: number;
 
-  interface CompileResult {
-    code: string;
-    keptRanges: CodeRange[];
-  }
+  end: number;
+}
 
-  interface SourceMapOptions {
-    filename?: string;
-  }
+export interface CompileResult {
+  code: string;
+  keptRanges: CodeRange[];
+}
 
-  interface CodeRange {
-    start: number;
-    end: number;
-  }
+export interface SourceMapOptions {
+  filename?: string;
+}
 
-  interface LineMapping {
-    originalLine: number;
-    originalColumn: number;
-    generatedLine: number;
-    generatedColumn: number;
-  }
+export interface CodeRange {
+  start: number;
+  end: number;
+}
+
+export interface LineMapping {
+  originalLine: number;
+  originalColumn: number;
+  generatedLine: number;
+  generatedColumn: number;
 }

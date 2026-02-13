@@ -1,4 +1,5 @@
 import type { ExistingRawSourceMap } from 'rollup';
+import type { LineMapping, SourceMapOptions, CodeRange } from '../types/global.js';
 
 /**
  * Generate sourcemap for conditional compilation
@@ -182,7 +183,7 @@ export class SourceMapBuilder {
 export function createSourceMap(
   originalCode: string,
   keptRanges: CodeRange[],
-  options: SourceMapOptions = {}
+  options: SourceMapOptions = {},
 ): ExistingRawSourceMap {
   const builder = new SourceMapBuilder(options);
   return builder.build(originalCode, keptRanges);

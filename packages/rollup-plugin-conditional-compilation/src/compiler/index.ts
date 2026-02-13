@@ -1,8 +1,9 @@
 import type { Plugin } from 'rollup';
-import { RollupConditionalCompilationOptions } from '../types/common.js';
+import { RollupConditionalCompilationOptions } from '../types/global.js';
 
 import { IfParser } from './parser.js';
 import { createSourceMap } from './sourcemap.js';
+import { Consts } from './consts.js';
 
 /**
  * ## Usage
@@ -43,7 +44,7 @@ export function conditionalCompilation(options: Partial<RollupConditionalCompila
   };
 }
 
-function normalize(options: Partial<Opts>): Opts {
+function normalize(options: Partial<RollupConditionalCompilationOptions>): RollupConditionalCompilationOptions {
   if (typeof options !== 'object' || options === null) {
     throw new Error(`Invalid options: '${options}', must be an object`);
   }

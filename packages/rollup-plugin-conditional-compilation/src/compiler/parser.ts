@@ -1,13 +1,20 @@
 import * as acorn from 'acorn';
+import type {
+  CompileResult,
+  DirvBlock,
+  IfBlock,
+  CodeRange,
+  RollupConditionalCompilationOptions,
+} from '../types/global.js';
 import { Dirv } from './consts.js';
 import { cdcp_error, cdcp_warning } from '../misc/errors.js';
 
 const REGEX = new RegExp(`^(${Dirv.If}|${Dirv.Endif}|${Dirv.Elif}|${Dirv.Else})\\b`);
 export class IfParser {
-  private readonly _opts: Opts;
+  private readonly _opts: RollupConditionalCompilationOptions;
   private readonly _keys: string[] = [];
   private readonly _values: any[] = [];
-  constructor(_opts: Opts) {
+  constructor(_opts: RollupConditionalCompilationOptions) {
     this._opts = _opts;
     const kv = Object.entries(this._opts.variables);
     for (let i = 0; i < kv.length; i++) {

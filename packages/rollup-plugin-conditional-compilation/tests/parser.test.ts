@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { IfParser } from '../src/compiler/parser.js';
+import { loadjs } from './setup.js';
 
 describe('IfParser basic behaviors', () => {
   const opts = { variables: { DEBUG: true, VAL: 7 } } as any;
