@@ -21,7 +21,7 @@ export async function publish(who: string | undefined) {
   }
 
   const env = { ...process.env, LIB_PACKAGE_PATH: info.path };
-  execSync(`pnpm --filter ${info.name} build`, { stdio: 'inherit', env });
+  execSync(`rollup -c rollup.config.ts --configPlugin typescript`, { stdio: 'inherit', env });
   execSync(`pnpm --filter ${info.name} publish --no-git-checks --access public`, { stdio: 'inherit', env });
   console.log(`Published ${info.name}@${currentVersionStr}`);
 

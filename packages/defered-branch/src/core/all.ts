@@ -1,3 +1,5 @@
+import { AnyFn } from '@defered-branch/global.js';
+
 export class DeferedBranchAll<BranchFn extends AnyFn, NoMatchFn extends AnyFn> {
   private _branches: BranchFn[] = [];
 

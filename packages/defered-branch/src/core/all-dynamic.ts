@@ -1,3 +1,5 @@
+import { AnyFn, Predicate } from '@defered-branch/global.js';
+
 export class DeferedBranchAllDynamic<
   BranchFn extends AnyFn,
   NoMatchFn extends AnyFn,

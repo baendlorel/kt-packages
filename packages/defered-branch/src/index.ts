@@ -2,6 +2,7 @@ import { DeferedBranch } from './core/default.js';
 import { DeferedBranchDynamic } from './core/dynamic.js';
 import { DeferedBranchAllDynamic } from './core/all-dynamic.js';
 import { DeferedBranchAll } from './core/all.js';
+import { AnyFn, Predicate } from './global.js';
 
 /**
  * ## Steps to use

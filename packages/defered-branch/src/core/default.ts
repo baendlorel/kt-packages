@@ -1,3 +1,5 @@
+import { AnyFn } from '@defered-branch/global.js';
+
 export class DeferedBranch<BranchFn extends AnyFn, NoMatchFn extends AnyFn> {
   private _branch: BranchFn | null = null;
 
