@@ -1,7 +1,7 @@
 import { isPrimitive, expectTargetAndKeys, expectTarget } from './common.js';
 import { $getPrototypeOf, $ownKeys, $has, $get, $set, $delete, $define, $arrayFrom } from './native.js';
 
-interface ReachResult {
+export interface ReachResult {
   /**
    * The furthest reachable value in the object at the given property path.
    */
@@ -19,7 +19,7 @@ interface ReachResult {
   reached: boolean;
 }
 
-interface GroupedKey {
+export interface GroupedKey {
   /**
    * Keys (includes symbols)
    */
