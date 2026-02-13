@@ -1,3 +1,4 @@
+import { checkLength } from './errors.js';
 import {
   add,
   set,
@@ -13,9 +14,7 @@ import {
 } from './operators.js';
 
 export class FlatPair<K, V> {
-  static from<T extends Map<any, any>>(
-    map: T
-  ): T extends Map<infer K, infer V> ? FlatPair<K, V> : never {
+  static from<T extends Map<any, any>>(map: T): T extends Map<infer K, infer V> ? FlatPair<K, V> : never {
     if (Object.prototype.toString.call(map) !== '[object Map]') {
       throw new TypeError('[__NAME__: __func__] Argument must be a Map');
     }
@@ -29,7 +28,7 @@ export class FlatPair<K, V> {
 
   constructor(items: any[]) {
     const len = items.length;
-    __INVALID_LENGTH_THROW__(len);
+    checkLength(len);
     this._items = items.slice();
   }
 

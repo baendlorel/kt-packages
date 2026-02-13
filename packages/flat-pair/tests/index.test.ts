@@ -17,7 +17,7 @@ import {
 describe('operators', () => {
   it('size returns pair count and throws on odd length', () => {
     expect(size(['a', 1, 'b', 2])).toBe(2);
-    expect(() => size(['a', 1, 'b'])).toThrow('Invalid items length, must be even number');
+    expect(() => size(['a', 1, 'b'])).toThrow(/Invalid length/);
   });
 
   it('add appends pair and avoids duplicates', () => {
@@ -67,7 +67,7 @@ describe('operators', () => {
       function (this: any, value, key, index, arr) {
         calls.push({ value, key, index, arr, thisMarker: this.marker });
       },
-      thisArg
+      thisArg,
     );
 
     expect(calls.length).toBe(2);

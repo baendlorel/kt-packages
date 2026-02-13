@@ -1,3 +1,5 @@
+import { checkLength } from './errors.js';
+
 const $is = function SameValueZero(x: any, y: any): boolean {
   if (x === y) {
     // +0 equals -0
@@ -9,7 +11,7 @@ const $is = function SameValueZero(x: any, y: any): boolean {
 
 export function size(items: any[]): number {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   return len / 2;
 }
 
@@ -19,7 +21,7 @@ export function size(items: any[]): number {
  */
 export function add<K, V>(items: any[], key: K, value: V): void {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if ($is(items[i], key)) {
       return;
@@ -33,7 +35,7 @@ export function add<K, V>(items: any[], key: K, value: V): void {
  */
 export function set<K, V>(items: any[], key: K, value: V): void {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if ($is(items[i], key)) {
       items[i + 1] = value;
@@ -45,7 +47,7 @@ export function set<K, V>(items: any[], key: K, value: V): void {
 
 export function has<K>(items: any[], key: K): boolean {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if ($is(items[i], key)) {
       return true;
@@ -56,7 +58,7 @@ export function has<K>(items: any[], key: K): boolean {
 
 export function hasByValue<V>(items: any[], value: V): boolean {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 1; i < len; i += 2) {
     if ($is(items[i], value)) {
       return true;
@@ -67,7 +69,7 @@ export function hasByValue<V>(items: any[], value: V): boolean {
 
 export function get<K, V>(items: any[], key: K): V | undefined {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if ($is(items[i], key)) {
       return items[i + 1];
@@ -78,7 +80,7 @@ export function get<K, V>(items: any[], key: K): V | undefined {
 
 export function getByValue<K, V>(items: any[], value: V): K | undefined {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 1; i < len; i += 2) {
     if ($is(items[i], value)) {
       return items[i - 1];
@@ -89,7 +91,7 @@ export function getByValue<K, V>(items: any[], value: V): K | undefined {
 
 export function remove<K>(items: any[], key: K): boolean {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if ($is(items[i], key)) {
       items.splice(i, 2);
@@ -101,7 +103,7 @@ export function remove<K>(items: any[], key: K): boolean {
 
 export function removeByValue<V>(items: any[], value: V): boolean {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 1; i < len; i += 2) {
     if ($is(items[i], value)) {
       items.splice(i - 1, 2);
@@ -119,10 +121,10 @@ export function removeByValue<V>(items: any[], value: V): boolean {
 export function forEach<K, V>(
   items: any[],
   callback: (value: V, key: K, index: number, array: any[]) => void,
-  thisArg?: any
+  thisArg?: any,
 ): void {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     if (i in items) {
       callback.call(thisArg, items[i + 1] as V, items[i] as K, i, items);
@@ -136,10 +138,10 @@ export function clear(items: any[]): void {
 
 export function find<K, V>(
   items: any[],
-  predicate: (value: V, key: K, index: number, array: any[]) => boolean
+  predicate: (value: V, key: K, index: number, array: any[]) => boolean,
 ): [K, V] | undefined {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     const found = predicate(items[i + 1] as V, items[i] as K, i, items);
     if (found) {
@@ -151,10 +153,10 @@ export function find<K, V>(
 
 export function findIndex<K, V>(
   items: any[],
-  predicate: (value: V, key: K, index: number, array: any[]) => boolean
+  predicate: (value: V, key: K, index: number, array: any[]) => boolean,
 ): number {
   const len = items.length;
-  __INVALID_LENGTH_THROW__(len);
+  checkLength(len);
   for (let i = 0; i < len; i += 2) {
     const found = predicate(items[i + 1] as V, items[i] as K, i, items);
     if (found) {
