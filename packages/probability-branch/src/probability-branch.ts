@@ -1,5 +1,6 @@
-import { isSafeInteger, MAX_NUM, NOT_PROVIDED, PRIVATE } from './common.js';
-import { expect, expectPrivate, warn } from './expect.js';
+import type { RandomGenerator, AnyFn, ProbabilityBranchOptions, ProbabilityBranchResult } from './global.js';
+import { $isSafeInt, MAX_INT } from './common.js';
+import { $expect, $warn } from './expect.js';
 import { MersenneTwister } from './mersenne-twister.js';
 
 const defaultGen = new MersenneTwister();
@@ -13,12 +14,10 @@ class ProbabilityBranch {
   // options
   private limit: number;
 
-  constructor(priv: symbol, opts?: Partial<ProbabilityBranchOptions>) {
-    expectPrivate(priv);
-
+  constructor(opts?: Partial<ProbabilityBranchOptions>) {
     const { limit = 1 } = Object(opts) as ProbabilityBranchOptions;
     this.limit = limit;
-    expect(limit >= 0 && isSafeInteger(limit), `'limit' must be a non-negative integer`);
+    $expect(limit >= 0 && $isSafeInt(limit), `'limit' must be a non-negative integer`);
   }
 
   /**
@@ -38,10 +37,10 @@ class ProbabilityBranch {
    * @param handler the function to call when this branch is selected
    */
   br(weight: number, handler: AnyFn): ProbabilityBranch {
-    expect(typeof weight === 'number', `'pointProbability' must be a number`);
-    expect(typeof handler === 'function', `'handler' must be a function`);
-    expect(weight >= 0, `'pointProbability' must be non-negative`);
-    expect(weight <= MAX_NUM, `'pointProbability' must < ${MAX_NUM}`);
+    $expect(typeof weight === 'number', `'pointProbability' must be a number`);
+    $expect(typeof handler === 'function', `'handler' must be a function`);
+    $expect(weight >= 0, `'pointProbability' must be non-negative`);
+    $expect(weight <= MAX_INT, `'pointProbability' must < ${MAX_INT}`);
 
     if (weight === 0) {
       return this;
@@ -59,17 +58,17 @@ class ProbabilityBranch {
    * @returns what the handler returns
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  run(probability: number = NOT_PROVIDED as any): ProbabilityBranchResult {
-    if (Object.is(probability, NOT_PROVIDED)) {
+  run(probability?: number): ProbabilityBranchResult {
+    if (probability === undefined) {
       probability = gen.random() * this.sum;
     }
     if (this.limit > 0) {
-      expect(this.limit > this.count, `This branch can only be run ${this.limit} time(s)`);
+      $expect(this.limit > this.count, `This branch can only be run ${this.limit} time(s)`);
     }
 
-    expect(
+    $expect(
       typeof probability === 'number',
-      `'probability' must be a number, please check your input or the generator`
+      `'probability' must be a number, please check your input or the generator`,
     );
 
     const result: ProbabilityBranchResult = {
@@ -160,7 +159,7 @@ interface ProbabilityBranchCreator {
  * __PKG_INFO__
  */
 export const pb: ProbabilityBranchCreator = (options?: Partial<ProbabilityBranchOptions>) =>
-  new ProbabilityBranch(PRIVATE, options);
+  new ProbabilityBranch(options);
 
 pb.restoreDefaultGenerator = function () {
   gen = defaultGen;
@@ -169,28 +168,28 @@ pb.restoreDefaultGenerator = function () {
 
 pb.setGenerator = function (generator: RandomGenerator) {
   const { random, getCount, getSeed, setSeed } = generator;
-  expect(typeof random === 'function', `'random' must be an instance of MersenneTwister`);
+  $expect(typeof random === 'function', `'random' must be an instance of MersenneTwister`);
   const o = Object.create(null) as RandomGenerator;
 
   if (typeof getCount === 'function') {
     o.getCount = getCount.bind(generator);
   } else {
     o.getCount = () => NaN;
-    warn(`'getCount' is not implemented, set to () => NaN`);
+    $warn(`'getCount' is not implemented, set to () => NaN`);
   }
 
   if (typeof generator.getSeed === 'function') {
     o.getSeed = getSeed.bind(generator);
   } else {
     o.getSeed = () => NaN;
-    warn(`'getSeed' is not implemented, set to () => NaN`);
+    $warn(`'getSeed' is not implemented, set to () => NaN`);
   }
 
   if (typeof generator.setSeed === 'function') {
     o.setSeed = setSeed.bind(generator);
   } else {
     o.setSeed = () => undefined;
-    warn(`'setSeed' is not implemented, set to () => undefined`);
+    $warn(`'setSeed' is not implemented, set to () => undefined`);
   }
 
   return pb;

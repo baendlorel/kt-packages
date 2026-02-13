@@ -1,7 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFn = (...args: any[]) => any;
+export type AnyFn = (...args: any[]) => any;
 
-interface ProbabilityBranchOptions {
+export interface ProbabilityBranchOptions {
   /**
    * Default is `1`, means you can only run the branch once
    * - if you want to run the branch multiple times, set this to `0`
@@ -9,12 +8,12 @@ interface ProbabilityBranchOptions {
   limit: number;
 }
 
-interface Branch {
+export interface Branch {
   handler: AnyFn;
   weight: number;
 }
 
-interface ProbabilityBranchResult {
+export interface ProbabilityBranchResult {
   /**
    * The probability value used for this run
    */
@@ -59,7 +58,7 @@ interface ProbabilityBranchResult {
   returned: unknown;
 }
 
-interface RandomGenerator {
+export interface RandomGenerator {
   random(): number;
 
   /**

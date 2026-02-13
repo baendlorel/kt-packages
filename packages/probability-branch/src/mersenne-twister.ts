@@ -1,5 +1,4 @@
-import { PRIVATE } from './common.js';
-import { expectPrivate } from './expect.js';
+import type { RandomGenerator } from './global.js';
 
 const enum Mersenne {
   N = 624,
@@ -18,16 +17,13 @@ export class MersenneTwister implements RandomGenerator {
 
   constructor(seed = 0) {
     this.seed = seed;
-    this.init(PRIVATE, seed);
+    this.init(seed);
   }
 
-  private init(priv: symbol, s: number) {
-    expectPrivate(priv);
-
+  private init(s: number) {
     this.mt[0] = s >>> 0;
     for (this.mti = 1; this.mti < Mersenne.N; this.mti++) {
-      this.mt[this.mti] =
-        (1812433253 * (this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30)) + this.mti) >>> 0;
+      this.mt[this.mti] = (1812433253 * (this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30)) + this.mti) >>> 0;
     }
     this.seed = s;
     this.count = 0;
@@ -52,12 +48,10 @@ export class MersenneTwister implements RandomGenerator {
    * @param seed
    */
   setSeed(seed: number): void {
-    this.init(PRIVATE, seed);
+    this.init(seed);
   }
 
-  private randomInt(priv: symbol): number {
-    expectPrivate(priv);
-
+  private randomInt(): number {
     let y: number;
     const mag01 = [0x0, Mersenne.MATRIX_A];
 
@@ -91,6 +85,6 @@ export class MersenneTwister implements RandomGenerator {
    * Generate a random number in the range [0, 1)
    */
   random(): number {
-    return this.randomInt(PRIVATE) * Mersenne.K;
+    return this.randomInt() * Mersenne.K;
   }
 }
