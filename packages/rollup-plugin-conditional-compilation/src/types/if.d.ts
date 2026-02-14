@@ -17,21 +17,25 @@ export interface IfNode extends CodeRange {
   body: IfStatement[];
   elseIfs: ElseIfNode[];
   else?: ElseNode;
+  endIf: EndIfNode;
 }
 
 export interface ElseIfNode extends CodeRange {
   type: 'elseif';
   condition: string;
   body: IfStatement[];
+  belong: IfNode;
 }
 
 export interface ElseNode extends CodeRange {
   type: 'else';
   body: IfStatement[];
+  belong: IfNode;
 }
 
 export interface EndIfNode extends CodeRange {
   type: 'endif';
+  belong: IfNode;
 }
 
 export type IfStatement = IfNode | ElseIfNode | ElseNode | EndIfNode;
