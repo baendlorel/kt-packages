@@ -2,7 +2,7 @@ import { basename } from 'node:path';
 import { Plugin } from 'rollup';
 import { createFilter } from '@rollup/pluginutils';
 
-import type { FuncMacroOptions } from './global.js';
+import type { FuncMacroOptions } from './types/options.js';
 import type { NameGetter } from './types/private.js';
 import { normalize } from './core/normalize.js';
 import { replaceIdentifiersBatch } from './core/replace.js';

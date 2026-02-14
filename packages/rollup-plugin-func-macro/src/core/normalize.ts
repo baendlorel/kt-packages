@@ -1,4 +1,4 @@
-import type { FuncMacroOptions } from '../global.js';
+import type { FuncMacroOptions } from '../types/options.js';
 
 export function normalize(options: Partial<FuncMacroOptions> | undefined): FuncMacroOptions {
   const raw = Object(options) as Partial<FuncMacroOptions>;
