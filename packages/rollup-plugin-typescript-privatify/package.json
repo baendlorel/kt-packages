@@ -2,35 +2,41 @@
 	"name": "rollup-plugin-typescript-privatify",
 	"version": "0.0.1",
 	"author": {
-		"name": "KasukabeTsumugi",
+		"name": "Kasukabe Tsumugi",
 		"email": "futami16237@gmail.com"
 	},
-	"description": "Convert private field 'a' to '#a', make it really private. Cooperate with babel to make it truely private.",
-	"description_zh": "把private关键词修饰的类元素转化为ES2022的真实私有元素。配合babel的降级可以提升兼容性",
+	"description": "Custom transformers for @rollup/plugin-typescript to turn TypeScript private members into runtime-private implementations.",
+	"description_zh": "给 @rollup/plugin-typescript 用的 transformer 预设，可把 TypeScript private 成员转换为运行时真正私有实现。",
 	"purpose": "rollup-plugin",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.cjs",
+		"default": "./dist/index.mjs"
+	},
 	"files": [
 		"dist"
 	],
-	"type": "module",
 	"homepage": "https://github.com/baendlorel/rollup-plugin-typescript-privatify#readme",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/baendlorel/rollup-plugin-typescript-privatify"
 	},
 	"keywords": [
-		"arbitrary base",
-		"base conversion",
-		"integer",
-		"arithmetic",
-		"addition",
-		"subtraction",
-		"multiplication",
-		"comparison",
-		"utility",
+		"rollup",
 		"typescript",
-		"javascript"
+		"transformer",
+		"private",
+		"weakmap",
+		"plugin"
 	],
-	"license": "MIT"
+	"license": "MIT",
+	"peerDependencies": {
+		"@rollup/plugin-typescript": "^12.0.0",
+		"typescript": ">=5.0.0"
+	}
 }

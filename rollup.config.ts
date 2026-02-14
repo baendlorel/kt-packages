@@ -43,6 +43,8 @@ export default () => {
         typescript({ tsconfig: tsconfigPath }),
         terser({
           format: {
+            beautify: true,
+            indent_level: 2,
             comments: false, // remove comments
           },
           compress: {

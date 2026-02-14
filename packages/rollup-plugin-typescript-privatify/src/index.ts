@@ -1,12 +1,17 @@
-export { NBaseInteger } from './n-base/integer';
+import { createPrivatifyTransformer } from './core/transformer.js';
+import type {
+  PrivatifyMode,
+  RollupTypescriptPrivatifyOptions,
+  TypescriptPrivatifyTransformers,
+} from './types/global.js';
 
-export class A {
-  private dendelion = 10;
-  #dendelion = 10;
-  #dendelion1 = 10;
+export type { PrivatifyMode, RollupTypescriptPrivatifyOptions, TypescriptPrivatifyTransformers };
+export { createPrivatifyTransformer };
 
-  private func() {
-    this.dendelion = 20;
-    return this.dendelion;
-  }
+export default function typescriptPrivatify(
+  options: RollupTypescriptPrivatifyOptions = {}
+): TypescriptPrivatifyTransformers {
+  return {
+    before: [createPrivatifyTransformer(options)],
+  };
 }
