@@ -4,14 +4,14 @@ console.log('block1-a');
 // #endif
 // #if B
 console.log('block2-b');
-// #elif C
+// #elseif C
 console.log('block2-c');
 // #endif
 // #if D
 console.log('block3-d');
-// #elif E
+// #elseif E
 console.log('block3-e');
-// #elif F
+// #elseif F
 console.log('block3-f');
 // #else
 console.log('block3-none');
@@ -26,16 +26,16 @@ console.log('L2');
 console.log('L3');
 // #if L4
 console.log('L4-deepest');
-// #elif L4_ALT
+// #elseif L4_ALT
 console.log('L4-alt');
 // #endif
-// #elif L3_ALT
+// #elseif L3_ALT
 console.log('L3-alt');
 // #endif
-// #elif L2_ALT
+// #elseif L2_ALT
 console.log('L2-alt');
 // #endif
-// #elif L1_ALT
+// #elseif L1_ALT
 console.log('L1-alt');
 // #endif
 

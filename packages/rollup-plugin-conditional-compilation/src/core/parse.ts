@@ -3,7 +3,13 @@ import { ElseIfNode, ElseNode, EndIfNode, IfNode, IfStatement, IfType } from '..
 const REG = /^\s*\/\/\s*#(if|elseif|else|endif)\b/;
 function getType(code: string): { type: IfType | null; condition: string } {
   let tp: IfType | null = null;
-  const replaced = code.replace(REG, (_, t) => ((tp = t), ''));
+  const replaced = code.replace(REG, (_, t) => {
+    if (t === 'elif') {
+      throw new SyntaxError(`#elif is no longer supported. Use #elseif instead.`);
+    }
+    tp = t;
+    return '';
+  });
 
   return { type: tp, condition: replaced };
 }

@@ -1,7 +1,7 @@
 // Error cases: malformed expression in elif
 // #if VALID
 console.log('valid');
-// #elif (BROKEN &&
+// #elseif (BROKEN &&
 console.log('broken-elif');
 // #endif
 

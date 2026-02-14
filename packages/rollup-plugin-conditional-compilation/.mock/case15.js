@@ -1,7 +1,7 @@
 // Error cases: malformed elif/else usage
 
 // Error: unmatched elif
-// #elif ORPHAN
+// #elseif ORPHAN
 console.log('orphan-elif');
 // #endif
 

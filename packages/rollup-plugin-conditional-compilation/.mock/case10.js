@@ -1,9 +1,9 @@
 // Complex nested if-elif-else chains
 // #if A
 console.log('a-true');
-// #elif B
+// #elseif B
 console.log('b-true');
-// #elif C
+// #elseif C
 console.log('c-true');
 // #else
 console.log('all-false');
@@ -14,7 +14,7 @@ console.log('all-false');
 console.log('x-start');
 // #if Y
 console.log('xy-true');
-// #elif Z
+// #elseif Z
 console.log('xz-true');
 // #else
 console.log('x-but-not-yz');

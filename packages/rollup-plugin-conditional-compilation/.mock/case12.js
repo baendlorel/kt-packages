@@ -1,9 +1,9 @@
 // Complex expressions in elif
 // #if A > 10
 console.log('a-large');
-// #elif A > 5
+// #elseif A > 5
 console.log('a-medium');
-// #elif A > 0
+// #elseif A > 0
 console.log('a-small');
 // #else
 console.log('a-nonpositive');
@@ -12,9 +12,9 @@ console.log('a-nonpositive');
 // Logical operators in elif chains
 // #if X && Y
 console.log('xy-both');
-// #elif X || Y
+// #elseif X || Y
 console.log('xy-either');
-// #elif !X && !Y
+// #elseif !X && !Y
 console.log('xy-neither');
 // #else
 console.log('xy-unknown');
@@ -23,9 +23,9 @@ console.log('xy-unknown');
 // Ternary and complex expressions
 // #if TYPE === 'prod'
 console.log('production');
-// #elif TYPE === 'dev'
+// #elseif TYPE === 'dev'
 console.log('development');
-// #elif TYPE === 'test'
+// #elseif TYPE === 'test'
 console.log('testing');
 // #else
 console.log('unknown-type');
