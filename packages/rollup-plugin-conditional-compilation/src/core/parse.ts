@@ -85,6 +85,9 @@ export function parse(code: string): IfNode[] {
   if (lines.length === 1) {
     throw new SyntaxError(`Only one if statement found (#${lines[0].type}), which is invalid. Ignoring it.`);
   }
+  if (lines[0].type !== 'if') {
+    throw new SyntaxError(`The first directive must be #if, but found #${lines[0].type}.`);
+  }
 
   // build the tree structure of if statements
   const ifNodes: IfNode[] = [];
@@ -156,7 +159,7 @@ const thenElseIf = (stack: IfStatement[], current: ElseIfNode) => {
 
 const thenElse = (stack: IfStatement[], current: ElseNode) => {
   if (stack.length === 0) {
-    throw new SyntaxError(`Unexpected #else statement found.`);
+    throw new SyntaxError(`Unexpected #else statement found. ${JSON.stringify(stack)}`);
   }
   const last = stack[stack.length - 1];
   if (last.type === 'else') {

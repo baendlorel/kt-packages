@@ -4,9 +4,8 @@ import { loadjs } from './setup.js';
 
 describe('Zero dependency parser', () => {
   it('supports disabling expression cache', () => {
-    expect(() => {
-      const result = parse(loadjs('case2.js'));
-      console.log(result);
-    });
+    const result = parse(loadjs('case2.js'));
+    console.log('result', result);
+    expect(result.length).toBe(1);
   });
 });

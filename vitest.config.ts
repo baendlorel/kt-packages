@@ -23,6 +23,7 @@ export default defineConfig(() => {
     test: {
       // setupFiles: ['./src/macros.ts'],
       include: ['**/*.{test,spec,e2e-spec}.?(c|m)[jt]s?(x)'],
+      silent: false,
     },
     resolve: {
       alias: getVitestAliases(),
