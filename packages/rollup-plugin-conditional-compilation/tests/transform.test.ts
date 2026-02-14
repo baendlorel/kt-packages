@@ -49,6 +49,22 @@ describe('core transform', () => {
     expect(result.code).toBe(code);
   });
 
+  it('supports function variables used in #if conditions', () => {
+    const code = `// #if HAS_FEATURE('pro')
+console.log('feature-on');
+// #else
+console.log('feature-off');
+// #endif
+`;
+    const nodes = parse(code);
+    const result = apply(code, nodes, {
+      HAS_FEATURE: (name: string) => name === 'pro',
+    });
+
+    expect(result.code).toContain("console.log('feature-on');");
+    expect(result.code).not.toContain("console.log('feature-off');");
+  });
+
   it('generates sourcemap with expected basic fields', () => {
     const code = loadjs('case9.js');
     const nodes = parse(code);

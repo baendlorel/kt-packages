@@ -13,7 +13,7 @@ console.log('user', userData); // when DEBUG is false, this line will be removed
 
 > **Note**: You should modify the plugin options to ensure **NOT to strip comments so quickly**, since we work with them. For example, with `@rollup/plugin-typescript`, set `removeComments: false`.
 
-## Breaking Changes in v2.0.0
+## Breaking Changes in v2.x
 
 Rewrote the plugin from scratch, with the following breaking changes:
 
@@ -32,6 +32,7 @@ Rewrote the plugin from scratch, with the following breaking changes:
 
 ```bash
 npm install --save-dev rollup-plugin-conditional-compilation
+# or
 pnpm add -D rollup-plugin-conditional-compilation
 ```
 
@@ -45,8 +46,11 @@ export default {
     // Recommended: run `conditional` before the TypeScript transformer so the
     // plugin operates on the original source comments.
     conditional({
-      variables: { DEBUG: false, FEATURE_X: true },
-      expressionCache: true, // default true
+      // variables to be used in expressions
+      variables: { DEBUG: false, FEATURE_X: true , FN: (a) => a+1 },
+
+      // default true
+      expressionCache: true,
     }),
     typescript({
       ...,

@@ -18,18 +18,21 @@ interface BranchState {
   nested: IfNode[];
 }
 
+type ConditionEvaluator = (condition: string) => boolean;
+
 export function apply(
   code: string,
   nodes: IfNode[],
   values: Record<string, unknown>,
   options: TransformOptions = {},
 ): TransformResult {
-  const magicString = new MagicString(code, { filename: options.filename });
+  const MagicStringCtor = MagicString as unknown as typeof import('magic-string').default;
+  const magicString = new MagicStringCtor(code, { filename: options.filename });
   const rangesToDrop: Array<{ start: number; end: number }> = [];
-  const initializeVarsCode = initializeVars(values);
+  const evaluateCondition = createEvaluator(values);
 
   for (let i = 0; i < nodes.length; i++) {
-    collectDrops(nodes[i], initializeVarsCode, rangesToDrop);
+    collectDrops(nodes[i], evaluateCondition, rangesToDrop);
   }
 
   const merged = mergeRanges(rangesToDrop);
@@ -50,7 +53,11 @@ export function apply(
   };
 }
 
-function collectDrops(node: IfNode, initializeVarsCode: string, ranges: Array<{ start: number; end: number }>) {
+function collectDrops(
+  node: IfNode,
+  evaluateCondition: ConditionEvaluator,
+  ranges: Array<{ start: number; end: number }>,
+) {
   const ifLineStart = toIndexStart(node.start);
   const ifLineEnd = node.end;
   const endIfLineStart = toIndexStart(node.endIf.start);
@@ -75,7 +82,7 @@ function collectDrops(node: IfNode, initializeVarsCode: string, ranges: Array<{ 
       break;
     }
 
-    if (evaluate(branch.condition, initializeVarsCode)) {
+    if (evaluateCondition(branch.condition)) {
       chosenIndex = i;
       break;
     }
@@ -89,7 +96,7 @@ function collectDrops(node: IfNode, initializeVarsCode: string, ranges: Array<{ 
     }
 
     for (let j = 0; j < branch.nested.length; j++) {
-      collectDrops(branch.nested[j], initializeVarsCode, ranges);
+      collectDrops(branch.nested[j], evaluateCondition, ranges);
     }
   }
 }
@@ -181,18 +188,25 @@ function mergeRanges(ranges: Array<{ start: number; end: number }>): Array<{ sta
   return merged;
 }
 
-function initializeVars(variables: Record<string, unknown>): string {
-  const list: string[] = [];
-  for (const key in variables) {
-    list.push(`${key} = ${JSON.stringify(variables[key])}`);
-  }
-  if (list.length === 0) {
-    return '';
-  }
-  return `var ${list.join(',')};`;
-}
+function createEvaluator(variables: Record<string, unknown>): ConditionEvaluator {
+  const entries = Object.entries(variables);
+  const names: string[] = [];
+  const values: unknown[] = [];
 
-function evaluate(condition: string, initializeVarsCode: string): boolean {
-  const fn = new Function(`${initializeVarsCode}return (${condition});`);
-  return Boolean(fn());
+  for (let i = 0; i < entries.length; i++) {
+    names.push(entries[i][0]);
+    values.push(entries[i][1]);
+  }
+
+  if (names.length === 0) {
+    return (condition) => {
+      const fn = new Function(`return (${condition});`);
+      return Boolean(fn());
+    };
+  }
+
+  return (condition) => {
+    const fn = new Function(...names, `return (${condition});`);
+    return Boolean(fn(...values));
+  };
 }
