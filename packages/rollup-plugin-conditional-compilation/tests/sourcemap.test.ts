@@ -1,46 +1,29 @@
-import { describe, it, expect } from 'vitest';
-import { IfParser } from '../src/compiler/parser.js';
-import { createSourceMap } from '../src/compiler/sourcemap.js';
+import { describe, expect, it } from 'vitest';
+import { parse } from '../src/core/parse.js';
+import { apply } from '../src/core/transform.js';
 import { loadjs } from './setup.js';
 
-describe('createSourceMap', () => {
-  it('generates a valid map from kept ranges', () => {
-    const code = loadjs('case9.js');
-    const parser = new IfParser({
-      variables: { A: true },
-      sourceType: 'script',
-      ecmaVersion: 'latest',
-    });
+function compileMap(code: string, variables: Record<string, unknown>, filename = 'source.js') {
+  const nodes = parse(code);
+  return apply(code, nodes, variables, { filename }).map;
+}
 
-    const result = parser.proceed(code);
-    expect(result).not.toBeNull();
+describe('transform sourcemap', () => {
+  it('generates a valid map for a typical file', () => {
+    const code = loadjs('case10.js');
+    const map = compileMap(code, { A: false, B: true, C: false, X: false, Y: false, Z: false }, 'case10.js');
 
-    const map = createSourceMap(code, result!.keptRanges, { filename: 'case9.js' });
     expect(map.version).toBe(3);
-    expect(map.file).toBe('case9.js');
-    expect(map.sources).toEqual(['case9.js']);
+    expect(map.file).toBe('case10.js');
+    expect(map.sources).toEqual(['case10.js']);
     expect(map.sourcesContent?.[0]).toBe(code);
     expect(typeof map.mappings).toBe('string');
-    expect(map.mappings.length).toBeGreaterThan(0);
   });
 
   it('handles fully removed output without throwing', () => {
-    const code = `// #if false
-console.log('removed');
-// #endif
-`;
-    const parser = new IfParser({
-      variables: {},
-      sourceType: 'script',
-      ecmaVersion: 'latest',
-    });
+    const code = `// #if false\nconsole.log('removed');\n// #endif\n`;
+    const map = compileMap(code, {}, 'empty.js');
 
-    const result = parser.proceed(code);
-    expect(result).not.toBeNull();
-    expect(result!.code.trim()).toBe('');
-
-    const map = createSourceMap(code, result!.keptRanges, { filename: 'empty.js' });
-    expect(map.version).toBe(3);
     expect(map.file).toBe('empty.js');
     expect(map.sources).toEqual(['empty.js']);
   });

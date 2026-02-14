@@ -1,45 +1,30 @@
-import { describe, it, expect } from 'vitest';
-import { IfParser } from '../src/compiler/parser.js';
+import { describe, expect, it } from 'vitest';
+import { parse } from '../src/core/parse.js';
+import { apply } from '../src/core/transform.js';
+import { loadjs } from './setup.js';
 
-function countFunctionConstructorCalls(run: () => void): number {
-  const globalObject = globalThis as unknown as { Function: FunctionConstructor };
-  const OriginalFunction = globalObject.Function;
-  let count = 0;
-
-  globalObject.Function = function (...args: string[]): Function {
-    count++;
-    return OriginalFunction(...args);
-  } as unknown as FunctionConstructor;
-
-  try {
-    run();
-  } finally {
-    globalObject.Function = OriginalFunction;
-  }
-
-  return count;
+function run(name: `case${number}.js`, variables: Record<string, unknown>) {
+  const code = loadjs(name);
+  return apply(code, parse(code), variables).code;
 }
 
-describe('IfParser expression cache option', () => {
-  it('enables expression cache by default', () => {
-    const compileCount = countFunctionConstructorCalls(() => {
-      const parser = new IfParser({ variables: { A: true } });
-      parser.evaluate('A');
-      parser.evaluate('A');
-      parser.evaluate('A');
-    });
+describe('transform evaluation safety', () => {
+  it('skips malformed elseif expressions when a previous branch already matched (case16)', () => {
+    const out = run('case16.js', { VALID: true, BROKEN: true });
 
-    expect(compileCount).toBe(1);
+    expect(out).toContain("console.log('valid');");
+    expect(out).not.toContain("console.log('broken-elif');");
   });
 
-  it('can disable expression cache explicitly', () => {
-    const compileCount = countFunctionConstructorCalls(() => {
-      const parser = new IfParser({ variables: { A: true }, expressionCache: false });
-      parser.evaluate('A');
-      parser.evaluate('A');
-      parser.evaluate('A');
-    });
+  it('throws when the selected branch has malformed syntax', () => {
+    const code = `// #if false\nkeep();\n// #elseif (BROKEN &&\nbad();\n// #endif\n`;
 
-    expect(compileCount).toBe(3);
+    expect(() => apply(code, parse(code), { BROKEN: true })).toThrow();
+  });
+
+  it('throws when branch expression references missing variables and must be evaluated', () => {
+    const code = `// #if UNKNOWN_FLAG\nkeep();\n// #endif\n`;
+
+    expect(() => apply(code, parse(code), {})).toThrow();
   });
 });

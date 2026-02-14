@@ -111,17 +111,21 @@ export function parse(code: string): IfNode[] {
     }
   }
 
+  if (stack.length > 0) {
+    throw new SyntaxError(`Unclosed #if statement found.`);
+  }
+
   return ifNodes;
 }
 
-const REG = /^\s*\/\/\s*#(if|elseif|else|endif)\b/;
+const REG = /^\s*\/\/\s*#(if|elseif|elif|else|endif)\b/;
 function getType(code: string): { type: IfType | null; condition: string } {
   let tp: IfType | null = null;
   const replaced = code.replace(REG, (_, t) => {
     if (t === 'elif') {
       throw new SyntaxError(`#elif is no longer supported. Use #elseif instead.`);
     }
-    tp = t;
+    tp = t as IfType;
     return '';
   });
 

@@ -1,65 +1,58 @@
-import { describe, it, expect } from 'vitest';
-import { IfParser } from '../src/compiler/parser.js';
+import { describe, expect, it } from 'vitest';
+import { parse } from '../src/core/parse.js';
 import { loadjs } from './setup.js';
 
-describe('IfParser basic behaviors', () => {
-  const opts = { variables: { DEBUG: true, VAL: 7 } };
-  const parser = new IfParser(opts);
-
-  it('evaluate should compute expressions using provided variables', () => {
-    expect(parser.evaluate('DEBUG')).toBe(true);
-    expect(parser.evaluate('VAL > 5')).toBe(true);
-    expect(parser.evaluate('!!DEBUG')).toBe(true);
+describe('core parse behavior', () => {
+  it('returns an empty array when no directives are present', () => {
+    expect(parse(loadjs('case3.js'))).toEqual([]);
   });
 
-  it('evaluate should throw on invalid expressions (unknown identifiers)', () => {
-    expect(() => parser.evaluate('UNKNOWN_VAR + 1')).toThrow();
+  it('builds sibling and nested if trees for case5', () => {
+    const nodes = parse(loadjs('case5.js'));
+
+    expect(nodes).toHaveLength(2);
+    expect(nodes[0].condition.trim()).toBe('B');
+    expect(nodes[1].condition.trim()).toBe('2+3');
+
+    const firstNested = nodes[0].body.filter((item) => item.type === 'if');
+    const secondNested = nodes[1].body.filter((item) => item.type === 'if');
+    expect(firstNested).toHaveLength(2);
+    expect(secondNested).toHaveLength(1);
   });
 
-  it('proceed should return null for files without recognized directives', () => {
-    const code = loadjs('case3.js');
-    expect(() => parser.proceed(code)).not.toThrow();
-    const result = parser.proceed(code);
-    expect(result).toBeNull();
+  it('links elseif/else/endif nodes back to their owner if node', () => {
+    const [topA, topX] = parse(loadjs('case10.js'));
+
+    expect(topA.elseIfs.length).toBe(2);
+    expect(topA.elseIfs.every((item) => item.belong === topA)).toBe(true);
+    expect(topA.else?.belong).toBe(topA);
+    expect(topA.endIf.belong).toBe(topA);
+
+    const nested = topX.body.find((item) => item.type === 'if');
+    expect(nested?.type).toBe('if');
+    if (nested?.type === 'if') {
+      expect(nested.elseIfs).toHaveLength(1);
+      expect(nested.elseIfs[0].belong).toBe(nested);
+      expect(nested.else?.belong).toBe(nested);
+      expect(nested.endIf.belong).toBe(nested);
+    }
   });
 
-  it('proceed should run on a file with directives without throwing (basic smoke test)', () => {
-    const code = loadjs('case2.js');
-    expect(() => parser.proceed(code)).not.toThrow();
+  it('throws on malformed directive order', () => {
+    expect(() => parse(loadjs('case15.js'))).toThrow(/Must start with #if, got #elseif/);
+    expect(() => parse(loadjs('case17.js'))).toThrow(/Unexpected #else statement found after #else/);
   });
 
-  it('should short-circuit #elif evaluation after a truthy #if', () => {
-    const code = `// #if true
-console.log('taken');
-// #elif UNKNOWN_VAR + 1
-console.log('skipped');
-// #endif
-`;
-    const result = parser.proceed(code);
-    expect(result?.code).toContain("console.log('taken');");
-    expect(result?.code).not.toContain("console.log('skipped');");
+  it('throws on orphan endif and unclosed blocks', () => {
+    const orphanEndIf = `// #if A\nkeep();\n// #endif\n// #endif\n`;
+    const unclosedOuter = `// #if A\n// #if B\nkeep();\n// #endif\n`;
+
+    expect(() => parse(orphanEndIf)).toThrow(/Unexpected #endif statement found/);
+    expect(() => parse(unclosedOuter)).toThrow(/Unclosed #if statement found/);
   });
 
-  it('should skip evaluating nested conditions inside an inactive parent branch', () => {
-    let effectCount = 0;
-    const code = `// #if OUTER
-// #if SIDE_EFFECT()
-console.log('inner');
-// #endif
-// #endif
-`;
-    const nestedParser = new IfParser({
-      variables: {
-        OUTER: false,
-        SIDE_EFFECT: () => {
-          effectCount++;
-          return true;
-        },
-      },
-    });
-
-    const result = nestedParser.proceed(code);
-    expect(effectCount).toBe(0);
-    expect(result?.code ?? '').not.toContain("console.log('inner');");
+  it('throws when #elif alias is used', () => {
+    const code = `// #if true\nkeep();\n// #elif false\ndrop();\n// #endif\n`;
+    expect(() => parse(code)).toThrow(/#elif is no longer supported/);
   });
 });

@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { getPackageInfo } from './common/package-info.js';
 
 export async function test(who: string | undefined) {
