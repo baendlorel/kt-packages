@@ -1,5 +1,5 @@
-import { Plugin } from 'rollup';
-import { ConstEnumReplacementList, RollupConstEnumOptions } from './types/global.js';
+import type { Plugin } from 'rollup';
+import type { ConstEnumReplacementList, RollupConstEnumOptions } from './types/global.js';
 
 import { normalize } from './options.js';
 import { ConstEnumHandler } from './const-enum.js';
