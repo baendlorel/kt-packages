@@ -30,11 +30,6 @@
 		"typescript",
 		"javascript"
 	],
-	"scripts": {
-		"test": "clear & vitest",
-		"lint": "oxlint .",
-		"cover": "clear & vitest --coverage",
-		"build": "tsx ./.scripts/rollup.ts"
-	},
+	"scripts": {},
 	"license": "MIT"
 }
