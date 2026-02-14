@@ -1,4 +1,4 @@
-import type { ecmaVersion } from 'acorn';
+import type { ECMA_VERSIONS } from '../misc/consts.js';
 
 export interface RollupConditionalCompilationOptions {
   /**
@@ -16,16 +16,11 @@ export interface RollupConditionalCompilationOptions {
    * Will be passed to Acorn
    * - default: 'latest'
    */
-  ecmaVersion: ecmaVersion;
+  ecmaVersion: (typeof ECMA_VERSIONS)[number];
 
   /**
    * Cache compiled expression functions by expression string.
    * - default: true
    */
   expressionCache: boolean;
-}
-
-declare module '*.js?raw' {
-  const content: string;
-  export default content;
 }
