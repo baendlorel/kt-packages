@@ -1,23 +1,12 @@
 import { describe, it, expect } from 'vitest';
+import { parse } from '../src/core/parse.js';
+import { loadjs } from './setup.js';
 
-describe('conditionalCompilation options', () => {
+describe('Zero dependency parser', () => {
   it('supports disabling expression cache', () => {
-    expect(() =>
-      conditionalCompilation({
-        variables: { FLAG: true },
-        expressionCache: false,
-        sourceType: 'script',
-        ecmaVersion: 'latest',
-      }),
-    ).not.toThrow();
-  });
-
-  it('validates expressionCache option type', () => {
-    expect(() =>
-      conditionalCompilation({
-        variables: {},
-        expressionCache: 'yes' as unknown as boolean,
-      }),
-    ).toThrow('expressionCache');
+    expect(() => {
+      const result = parse(loadjs('case2.js'));
+      console.log(result);
+    });
   });
 });

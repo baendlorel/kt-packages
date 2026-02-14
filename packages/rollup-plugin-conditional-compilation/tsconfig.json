@@ -9,5 +9,5 @@
     "outDir": "dist",
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", ".mock/*.js"]
 }

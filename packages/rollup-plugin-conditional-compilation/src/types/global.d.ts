@@ -71,3 +71,8 @@ export interface CodeLine {
   start: number;
   end: number;
 }
+
+declare module '*.js?raw' {
+  const content: string;
+  export default content;
+}
