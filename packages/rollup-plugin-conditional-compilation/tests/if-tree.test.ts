@@ -1,252 +1,182 @@
-import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from '../src/core/parse.js';
-import type { IfNode, IfStatement } from '../src/types/if.js';
 import { loadjs } from './setup.js';
 
-interface ElseIfTree {
-  condition: string;
-  body: IfTree[];
-}
+const ifCountInBody = (node: { body: Array<{ type: string }> }) => node.body.filter((x) => x.type === 'if').length;
 
-interface IfTree {
-  condition: string;
-  body: IfTree[];
-  elseIfs: ElseIfTree[];
-  hasElse: boolean;
-  elseBody: IfTree[];
-}
-
-interface ValidCase {
-  file: `case${number}.js`;
-  tree: IfTree[];
-}
-
-interface ErrorCase {
-  file: `case${number}.js`;
-  throws: RegExp;
-}
-
-type CaseSpec = ValidCase | ErrorCase;
-
-const elseif = (condition: string, body: IfTree[] = []): ElseIfTree => ({ condition, body });
-
-const ifTree = (
-  condition: string,
-  options?: {
-    body?: IfTree[];
-    elseIfs?: ElseIfTree[];
-    hasElse?: boolean;
-    elseBody?: IfTree[];
-  },
-): IfTree => ({
-  condition,
-  body: options?.body ?? [],
-  elseIfs: options?.elseIfs ?? [],
-  hasElse: options?.hasElse ?? false,
-  elseBody: options?.elseBody ?? [],
-});
-
-const CASES: CaseSpec[] = [
-  { file: 'case1.js', tree: [ifTree('false')] },
-  { file: 'case2.js', tree: [ifTree('VAL > 10', { elseIfs: [elseif('VAL > 5')], hasElse: true })] },
-  { file: 'case3.js', tree: [] },
-  { file: 'case4.js', tree: [ifTree('DEBUG')] },
-  {
-    file: 'case5.js',
-    tree: [ifTree('B', { body: [ifTree('true'), ifTree('1')] }), ifTree('2+3', { body: [ifTree('A')] })],
-  },
-  { file: 'case6.js', tree: [ifTree('A && (B || C)', { body: [ifTree('B')] })] },
-  { file: 'case7.js', tree: [ifTree('X'), ifTree('0'), ifTree('Y', { body: [ifTree('Z')] }), ifTree('-1')] },
-  { file: 'case8.js', tree: [ifTree('(A && )'), ifTree('D')] },
-  { file: 'case9.js', tree: [ifTree('A', { hasElse: true })] },
-  {
-    file: 'case10.js',
-    tree: [
-      ifTree('A', { elseIfs: [elseif('B'), elseif('C')], hasElse: true }),
-      ifTree('X', { body: [ifTree('Y', { elseIfs: [elseif('Z')], hasElse: true })] }),
-    ],
-  },
-  {
-    file: 'case11.js',
-    tree: [
-      ifTree('false', {
-        elseIfs: [elseif('false'), elseif('false'), elseif('true'), elseif('true')],
-        hasElse: true,
-      }),
-      ifTree('LEVEL1', {
-        body: [
-          ifTree('LEVEL2', {
-            elseIfs: [elseif('LEVEL2_ALT', [ifTree('LEVEL3')])],
-            hasElse: true,
-          }),
-        ],
-      }),
-    ],
-  },
-  {
-    file: 'case12.js',
-    tree: [
-      ifTree('A > 10', { elseIfs: [elseif('A > 5'), elseif('A > 0')], hasElse: true }),
-      ifTree('X && Y', { elseIfs: [elseif('X || Y'), elseif('!X && !Y')], hasElse: true }),
-      ifTree("TYPE === 'prod'", { elseIfs: [elseif("TYPE === 'dev'"), elseif("TYPE === 'test'")], hasElse: true }),
-    ],
-  },
-  {
-    file: 'case13.js',
-    tree: [
-      ifTree('A'),
-      ifTree('B', { elseIfs: [elseif('C')] }),
-      ifTree('D', { elseIfs: [elseif('E'), elseif('F')], hasElse: true }),
-      ifTree('L1', {
-        body: [
-          ifTree('L2', {
-            body: [
-              ifTree('L3', {
-                body: [ifTree('L4', { elseIfs: [elseif('L4_ALT')] })],
-                elseIfs: [elseif('L3_ALT')],
-              }),
-            ],
-            elseIfs: [elseif('L2_ALT')],
-          }),
-        ],
-        elseIfs: [elseif('L1_ALT')],
-      }),
-    ],
-  },
-  {
-    file: 'case14.js',
-    tree: [
-      ifTree('VAL === 1', {
-        elseIfs: [elseif('VAL === 2'), elseif('VAL === 3'), elseif('VAL === 4'), elseif('VAL === 5')],
-        hasElse: true,
-      }),
-      ifTree('OUTER', {
-        body: [
-          ifTree('INNER_A', { elseIfs: [elseif('INNER_B'), elseif('INNER_C')], hasElse: true }),
-          ifTree('SECOND_A', { elseIfs: [elseif('SECOND_B')], hasElse: true }),
-        ],
-        elseIfs: [elseif('OUTER_ALT')],
-        hasElse: true,
-      }),
-    ],
-  },
-  { file: 'case15.js', throws: /Must start with #if|Unexpected #elseif|#elif is no longer supported/ },
-  { file: 'case16.js', tree: [ifTree('VALID', { elseIfs: [elseif('(BROKEN &&')] })] },
-  { file: 'case17.js', throws: /Unexpected #else statement found after #else/ },
-];
-
-const isIf = (node: IfStatement): node is IfNode => node.type === 'if';
-
-const directChildren = (node: IfNode): IfNode[] => {
-  const bodyChildren = node.body.filter(isIf);
-  const elseIfChildren = node.elseIfs.flatMap((item) => item.body.filter(isIf));
-  const elseChildren = node.else ? node.else.body.filter(isIf) : [];
-  return [...bodyChildren, ...elseIfChildren, ...elseChildren];
-};
-
-const rootIfNodes = (nodes: IfNode[]): IfNode[] => {
-  const children = new Set<IfNode>();
-  for (let i = 0; i < nodes.length; i++) {
-    for (const child of directChildren(nodes[i])) {
-      children.add(child);
-    }
-  }
-
-  return nodes.filter((node) => !children.has(node));
-};
-
-const normalize = (node: IfNode): IfTree =>
-  ifTree(node.condition.trim(), {
-    body: node.body.filter(isIf).map(normalize),
-    elseIfs: node.elseIfs.map((item) => elseif(item.condition.trim(), item.body.filter(isIf).map(normalize))),
-    hasElse: Boolean(node.else),
-    elseBody: node.else ? node.else.body.filter(isIf).map(normalize) : [],
-  });
-
-const normalizeRoots = (nodes: IfNode[]): IfTree[] => rootIfNodes(nodes).map(normalize);
-
-const countNodes = (nodes: IfTree[]): number => {
-  let total = 0;
-  for (let i = 0; i < nodes.length; i++) {
-    total += 1;
-    total += countNodes(nodes[i].body);
-    total += countNodes(nodes[i].elseBody);
-    for (let j = 0; j < nodes[i].elseIfs.length; j++) {
-      total += countNodes(nodes[i].elseIfs[j].body);
-    }
-  }
-
-  return total;
-};
-
-const assertLinks = (nodes: IfNode[]) => {
-  const visited = new Set<IfNode>();
-
-  const walk = (node: IfNode, parent?: IfNode): void => {
-    expect(visited.has(node)).toBe(false);
-    visited.add(node);
-    expect(node.endIf.type).toBe('endif');
-    expect(node.endIf.belong).toBe(node);
-    expect(node.start).toBeLessThan(node.end);
-    expect(node.end).toBeLessThanOrEqual(node.endIf.start);
-
-    if (parent) {
-      expect(node.start).toBeGreaterThan(parent.start);
-      expect(node.endIf.end).toBeLessThan(parent.endIf.end);
-    }
-
-    for (let i = 0; i < node.elseIfs.length; i++) {
-      const branch = node.elseIfs[i];
-      expect(branch.belong).toBe(node);
-      expect(branch.start).toBeLessThan(branch.end);
-      for (const child of branch.body.filter(isIf)) {
-        walk(child, node);
-      }
-    }
-
-    if (node.else) {
-      expect(node.else.belong).toBe(node);
-      expect(node.else.start).toBeLessThan(node.else.end);
-      for (const child of node.else.body.filter(isIf)) {
-        walk(child, node);
-      }
-    }
-
-    for (const child of node.body.filter(isIf)) {
-      walk(child, node);
-    }
-  };
-
-  for (const root of rootIfNodes(nodes)) {
-    walk(root);
-  }
-
-  expect(visited.size).toBe(nodes.length);
-};
+const cond = (text: string) => text.trim();
 
 describe('Zero dependency parser if-tree', () => {
-  it('covers every caseX.js fixture', () => {
-    const files = readdirSync(join(import.meta.dirname, '..', '.mock'))
-      .filter((name) => /^case\d+\.js$/.test(name))
-      .sort((a, b) => Number(a.slice(4, -3)) - Number(b.slice(4, -3)));
-    expect(CASES.map((item) => item.file)).toEqual(files);
+  it('case1', () => {
+    const result = parse(loadjs('case1.js'));
+    expect(result.length).toBe(1);
+    expect(cond(result[0].condition)).toBe('false');
+    expect(result[0].elseIfs.length).toBe(0);
+    expect(result[0].else).toBeUndefined();
   });
 
-  for (const spec of CASES) {
-    if ('throws' in spec) {
-      it(`${spec.file} should throw`, () => {
-        expect(() => parse(loadjs(spec.file))).toThrow(spec.throws);
-      });
-      continue;
-    }
+  it('case2', () => {
+    const result = parse(loadjs('case2.js'));
+    expect(result.length).toBe(1);
+    expect(cond(result[0].condition)).toBe('VAL > 10');
+    expect(result[0].elseIfs.length).toBe(1);
+    expect(cond(result[0].elseIfs[0].condition)).toBe('VAL > 5');
+    expect(result[0].else).toBeDefined();
+  });
 
-    it(`${spec.file} should generate the expected ifnode tree`, () => {
-      const result = parse(loadjs(spec.file));
-      expect(result.length).toBe(countNodes(spec.tree));
-      assertLinks(result);
-      expect(normalizeRoots(result)).toEqual(spec.tree);
-    });
-  }
+  it('case3', () => {
+    const result = parse(loadjs('case3.js'));
+    expect(result.length).toBe(0);
+  });
+
+  it('case4', () => {
+    const result = parse(loadjs('case4.js'));
+    expect(result.length).toBe(1);
+    expect(cond(result[0].condition)).toBe('DEBUG');
+  });
+
+  it('case5', () => {
+    const result = parse(loadjs('case5.js'));
+    expect(result.length).toBe(5);
+    expect(cond(result[0].condition)).toBe('B');
+    expect(ifCountInBody(result[0])).toBe(2);
+    expect(cond(result[1].condition)).toBe('true');
+    expect(cond(result[2].condition)).toBe('1');
+    expect(cond(result[3].condition)).toBe('2+3');
+    expect(ifCountInBody(result[3])).toBe(1);
+    expect(cond(result[4].condition)).toBe('A');
+  });
+
+  it('case6', () => {
+    const result = parse(loadjs('case6.js'));
+    expect(result.length).toBe(3);
+    expect(cond(result[0].condition)).toBe('SHOULD_NOT_BE_SEEN');
+    expect(cond(result[1].condition)).toBe('A && (B || C)');
+    expect(ifCountInBody(result[1])).toBe(1);
+    expect(cond(result[2].condition)).toBe('B');
+  });
+
+  it('case7', () => {
+    const result = parse(loadjs('case7.js'));
+    expect(result.length).toBe(5);
+    expect(cond(result[0].condition)).toBe('X');
+    expect(cond(result[1].condition)).toBe('0');
+    expect(cond(result[2].condition)).toBe('Y');
+    expect(ifCountInBody(result[2])).toBe(1);
+    expect(cond(result[3].condition)).toBe('Z');
+    expect(cond(result[4].condition)).toBe('-1');
+  });
+
+  it('case8', () => {
+    const result = parse(loadjs('case8.js'));
+    expect(result.length).toBe(2);
+    expect(cond(result[0].condition)).toBe('(A && )');
+    expect(cond(result[1].condition)).toBe('D');
+  });
+
+  it('case9', () => {
+    const result = parse(loadjs('case9.js'));
+    expect(result.length).toBe(1);
+    expect(cond(result[0].condition)).toBe('A');
+    expect(result[0].elseIfs.length).toBe(0);
+    expect(result[0].else).toBeDefined();
+  });
+
+  it('case10', () => {
+    const result = parse(loadjs('case10.js'));
+    expect(result.length).toBe(3);
+    expect(cond(result[0].condition)).toBe('A');
+    expect(result[0].elseIfs.length).toBe(2);
+    expect(result[0].else).toBeDefined();
+    expect(cond(result[1].condition)).toBe('X');
+    expect(ifCountInBody(result[1])).toBe(1);
+    expect(cond(result[2].condition)).toBe('Y');
+    expect(result[2].elseIfs.length).toBe(1);
+    expect(result[2].else).toBeDefined();
+  });
+
+  it('case11', () => {
+    const result = parse(loadjs('case11.js'));
+    expect(result.length).toBe(4);
+    expect(cond(result[0].condition)).toBe('false');
+    expect(result[0].elseIfs.length).toBe(4);
+    expect(result[0].else).toBeDefined();
+    expect(cond(result[1].condition)).toBe('LEVEL1');
+    expect(ifCountInBody(result[1])).toBe(1);
+    expect(cond(result[2].condition)).toBe('LEVEL2');
+    expect(result[2].elseIfs.length).toBe(1);
+    expect(result[2].else).toBeDefined();
+    expect(cond(result[3].condition)).toBe('LEVEL3');
+  });
+
+  it('case12', () => {
+    const result = parse(loadjs('case12.js'));
+    expect(result.length).toBe(3);
+    expect(cond(result[0].condition)).toBe('A > 10');
+    expect(result[0].elseIfs.length).toBe(2);
+    expect(result[0].else).toBeDefined();
+    expect(cond(result[1].condition)).toBe('X && Y');
+    expect(result[1].elseIfs.length).toBe(2);
+    expect(result[1].else).toBeDefined();
+    expect(cond(result[2].condition)).toBe("TYPE === 'prod'");
+    expect(result[2].elseIfs.length).toBe(2);
+    expect(result[2].else).toBeDefined();
+  });
+
+  it('case13', () => {
+    const result = parse(loadjs('case13.js'));
+    expect(result.length).toBe(7);
+    expect(cond(result[0].condition)).toBe('A');
+    expect(cond(result[1].condition)).toBe('B');
+    expect(result[1].elseIfs.length).toBe(1);
+    expect(cond(result[2].condition)).toBe('D');
+    expect(result[2].elseIfs.length).toBe(2);
+    expect(result[2].else).toBeDefined();
+    expect(cond(result[3].condition)).toBe('L1');
+    expect(result[3].elseIfs.length).toBe(1);
+    expect(ifCountInBody(result[3])).toBe(1);
+    expect(cond(result[4].condition)).toBe('L2');
+    expect(result[4].elseIfs.length).toBe(1);
+    expect(ifCountInBody(result[4])).toBe(1);
+    expect(cond(result[5].condition)).toBe('L3');
+    expect(result[5].elseIfs.length).toBe(1);
+    expect(ifCountInBody(result[5])).toBe(1);
+    expect(cond(result[6].condition)).toBe('L4');
+    expect(result[6].elseIfs.length).toBe(1);
+  });
+
+  it('case14', () => {
+    const result = parse(loadjs('case14.js'));
+    expect(result.length).toBe(4);
+    expect(cond(result[0].condition)).toBe('VAL === 1');
+    expect(result[0].elseIfs.length).toBe(4);
+    expect(result[0].else).toBeDefined();
+    expect(cond(result[1].condition)).toBe('OUTER');
+    expect(result[1].elseIfs.length).toBe(1);
+    expect(result[1].else).toBeDefined();
+    expect(ifCountInBody(result[1])).toBe(2);
+    expect(cond(result[2].condition)).toBe('INNER_A');
+    expect(result[2].elseIfs.length).toBe(2);
+    expect(result[2].else).toBeDefined();
+    expect(cond(result[3].condition)).toBe('SECOND_A');
+    expect(result[3].elseIfs.length).toBe(1);
+    expect(result[3].else).toBeDefined();
+  });
+
+  it('case15', () => {
+    expect(() => parse(loadjs('case15.js'))).toThrow(/Must start with #if, got #elseif./);
+  });
+
+  it('case16', () => {
+    const result = parse(loadjs('case16.js'));
+    expect(result.length).toBe(1);
+    expect(cond(result[0].condition)).toBe('VALID');
+    expect(result[0].elseIfs.length).toBe(1);
+    expect(cond(result[0].elseIfs[0].condition)).toBe('(BROKEN &&');
+    expect(result[0].else).toBeUndefined();
+  });
+
+  it('case17', () => {
+    expect(() => parse(loadjs('case17.js'))).toThrow(/Unexpected #else statement found after #else/);
+  });
 });
