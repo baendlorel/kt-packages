@@ -92,7 +92,9 @@ export function parse(code: string): IfNode[] {
   for (let i = 1; i < lines.length; i++) {
     const current = lines[i];
     if (current.type === 'if') {
-      ifNodes.push(current);
+      if (stack.length === 0) {
+        ifNodes.push(current);
+      }
       thenIf(stack, current);
     }
 

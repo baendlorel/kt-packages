@@ -27,9 +27,8 @@ export function apply(
   const magicString = new MagicString(code, { filename: options.filename });
   const rangesToDrop: Array<{ start: number; end: number }> = [];
 
-  const roots = getRootNodes(nodes);
-  for (let i = 0; i < roots.length; i++) {
-    collectDrops(roots[i], values, rangesToDrop);
+  for (let i = 0; i < nodes.length; i++) {
+    collectDrops(nodes[i], values, rangesToDrop);
   }
 
   const merged = mergeRanges(rangesToDrop);
@@ -48,44 +47,6 @@ export function apply(
       hires: true,
     }) as unknown as ExistingRawSourceMap,
   };
-}
-
-function getRootNodes(nodes: IfNode[]): IfNode[] {
-  const children = new Set<IfNode>();
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    for (let j = 0; j < node.body.length; j++) {
-      const item = node.body[j];
-      if (item.type === 'if') {
-        children.add(item);
-      }
-    }
-    for (let j = 0; j < node.elseIfs.length; j++) {
-      const branch = node.elseIfs[j];
-      for (let k = 0; k < branch.body.length; k++) {
-        const item = branch.body[k];
-        if (item.type === 'if') {
-          children.add(item);
-        }
-      }
-    }
-    if (node.else) {
-      for (let j = 0; j < node.else.body.length; j++) {
-        const item = node.else.body[j];
-        if (item.type === 'if') {
-          children.add(item);
-        }
-      }
-    }
-  }
-
-  const roots: IfNode[] = [];
-  for (let i = 0; i < nodes.length; i++) {
-    if (!children.has(nodes[i])) {
-      roots.push(nodes[i]);
-    }
-  }
-  return roots;
 }
 
 function collectDrops(node: IfNode, values: Record<string, unknown>, ranges: Array<{ start: number; end: number }>) {
