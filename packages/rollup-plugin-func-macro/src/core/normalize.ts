@@ -1,10 +1,9 @@
 import type { FuncMacroOptions } from '../global.js';
-import { Identifier } from '../common.js';
 
 export function normalize(options: Partial<FuncMacroOptions> | undefined): FuncMacroOptions {
   const {
-    identifier = Identifier.Func,
-    fileIdentifier = Identifier.File,
+    identifier = '__func__',
+    fileIdentifier = '__file__',
     include = ['**/*.js', '**/*.ts'],
     exclude = ['node_modules/**'],
     fallback = identifier,

@@ -17,7 +17,6 @@ import { findFunctionNameAtPosition } from './core/find-name.js';
  */
 export function funcMacro(options?: Partial<FuncMacroOptions>): Plugin {
   const opts = normalize(options);
-
   const filter = createFilter(opts.include, opts.exclude);
 
   return {
