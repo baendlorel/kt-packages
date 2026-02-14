@@ -7,7 +7,7 @@ function getType(code: string): { type: IfType | null; condition: string } {
   return { type: tp, condition: replaced };
 }
 
-export function walk(statements: IfStatement[], code: string): IfNode[] {
+export function parse(code: string): IfNode[] {
   const rawLines = code.split('\n');
   if (rawLines.length === 0) {
     return [];
@@ -86,6 +86,7 @@ export function walk(statements: IfStatement[], code: string): IfNode[] {
     throw new SyntaxError(`Only one if statement found (#${lines[0].type}), which is invalid. Ignoring it.`);
   }
 
+  // build the tree structure of if statements
   const ifNodes: IfNode[] = [];
   const stack: IfStatement[] = [];
   for (let i = 1; i < lines.length; i++) {
