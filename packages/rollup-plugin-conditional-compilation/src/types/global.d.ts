@@ -65,3 +65,9 @@ export interface LineMapping {
   generatedLine: number;
   generatedColumn: number;
 }
+
+export interface CodeLine {
+  content: string;
+  start: number;
+  end: number;
+}
