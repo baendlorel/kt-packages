@@ -126,4 +126,38 @@ describe('funcMacro', () => {
     // Should replace both occurrences
     expect((result?.match(/"testFunc"/g) || []).length).toBe(2);
   });
+
+  it('should allow disabling __func__ replacement', () => {
+    const plugin = funcMacro({ identifier: null });
+    const code = pr`function testFunc() {
+                      console.log(__func__, __file__);
+                    }`;
+
+    const result = apply(plugin, code, 'test.js');
+    expect(result).toContain('__func__');
+    expect(result).toContain('"test.js"');
+  });
+
+  it('should allow disabling __file__ replacement', () => {
+    const plugin = funcMacro({ fileIdentifier: null });
+    const code = pr`function testFunc() {
+                      console.log(__func__, __file__);
+                    }`;
+
+    const result = apply(plugin, code, 'test.js');
+    expect(result).toContain('"testFunc"');
+    expect(result).toContain('__file__');
+  });
+
+  it('should accept include and exclude as string', () => {
+    const plugin = funcMacro({ include: '**/*.js', exclude: '**/*.skip.js' });
+    const code = pr`function testFunc() {
+                      console.log(__func__);
+                    }`;
+
+    const transformed = apply(plugin, code, 'test.js');
+    const skipped = apply(plugin, code, 'test.skip.js');
+    expect(transformed).toContain('"testFunc"');
+    expect(skipped).toBeNull();
+  });
 });

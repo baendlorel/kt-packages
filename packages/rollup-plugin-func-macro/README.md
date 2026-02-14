@@ -5,7 +5,13 @@
 [![npm version](https://img.shields.io/npm/v/rollup-plugin-func-macro.svg)](https://www.npmjs.com/package/rollup-plugin-func-macro) [![npm downloads](http://img.shields.io/npm/dm/rollup-plugin-func-macro.svg)](https://npmcharts.com/compare/rollup-plugin-func-macro,token-types?start=1200&interval=30)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/59dd6795e61949fb97066ca52e6097ef)](https://www.codacy.com/app/Borewit/rollup-plugin-func-macro?utm_source=github.com&utm_medium=referral&utm_content=Borewit/rollup-plugin-func-macro&utm_campaign=Badge_Grade)
 
-🎉 **Stable Release v1** - Production ready with comprehensive bug fixes and enhanced features!
+🎉 **Significant Performance Improvement in v1.2**
+
+- Small files: 8x improvement
+
+- Medium files: 40x improvement
+
+- Large files: 185x improvement
 
 🦋 **More Rollup Plugins** you might be interested in:
 

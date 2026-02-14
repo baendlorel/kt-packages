@@ -1,31 +1,22 @@
 import type { FuncMacroOptions } from '../global.js';
 
 export function normalize(options: Partial<FuncMacroOptions> | undefined): FuncMacroOptions {
-  const {
-    identifier = '__func__',
-    fileIdentifier = '__file__',
-    include = ['**/*.js', '**/*.ts'],
-    exclude = ['node_modules/**'],
-    fallback = identifier,
-    stringReplace = true,
-  } = Object(options);
+  const raw = Object(options) as Partial<FuncMacroOptions>;
+  const identifier = raw.identifier === undefined ? '__func__' : raw.identifier;
+  const fileIdentifier = raw.fileIdentifier === undefined ? '__file__' : raw.fileIdentifier;
+  const include = raw.include === undefined ? ['**/*.js', '**/*.ts'] : normalizePatterns(raw.include, 'include');
+  const exclude = raw.exclude === undefined ? ['node_modules/**'] : normalizePatterns(raw.exclude, 'exclude');
+  const fallback = raw.fallback === undefined ? (identifier ?? '__func__') : raw.fallback;
+  const stringReplace = raw.stringReplace === undefined ? true : raw.stringReplace;
 
   // [FATAL]
 
-  if (typeof identifier !== 'string' || !identifier) {
-    throw new TypeError('__NAME__: identifier must be a non-empty string');
+  if (identifier !== null && (typeof identifier !== 'string' || !identifier)) {
+    throw new TypeError('__NAME__: identifier must be a non-empty string or null');
   }
 
-  if (typeof fileIdentifier !== 'string' || !fileIdentifier) {
-    throw new TypeError('__NAME__: fileIdentifier must be a non-empty string or undefined');
-  }
-
-  if (!Array.isArray(include) || include.some((v) => typeof v !== 'string')) {
-    throw new TypeError('__NAME__: include must be string[]');
-  }
-
-  if (!Array.isArray(exclude) || exclude.some((v) => typeof v !== 'string')) {
-    throw new TypeError('__NAME__: exclude must be string[]');
+  if (fileIdentifier !== null && (typeof fileIdentifier !== 'string' || !fileIdentifier)) {
+    throw new TypeError('__NAME__: fileIdentifier must be a non-empty string or null');
   }
 
   if (typeof fallback !== 'string') {
@@ -38,13 +29,13 @@ export function normalize(options: Partial<FuncMacroOptions> | undefined): FuncM
 
   // [WARN]
 
-  if (identifier.length < 4) {
+  if (typeof identifier === 'string' && identifier.length < 4) {
     console.warn(
       `__NAME__: Warning: using a very short identifier('${identifier}') may lead to unexpected replacements.`,
     );
   }
 
-  if (fileIdentifier.length < 4) {
+  if (typeof fileIdentifier === 'string' && fileIdentifier.length < 4) {
     console.warn(
       `__NAME__: Warning: using a very short fileIdentifier('${fileIdentifier}') may lead to unexpected replacements.`,
     );
@@ -58,4 +49,16 @@ export function normalize(options: Partial<FuncMacroOptions> | undefined): FuncM
     fallback,
     stringReplace,
   };
+}
+
+function normalizePatterns(input: string | string[], name: 'include' | 'exclude'): string[] {
+  if (typeof input === 'string') {
+    return [input];
+  }
+
+  if (!Array.isArray(input) || input.some((v) => typeof v !== 'string')) {
+    throw new TypeError(`__NAME__: ${name} must be a string or string[]`);
+  }
+
+  return input;
 }

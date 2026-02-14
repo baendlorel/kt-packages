@@ -3,8 +3,9 @@ import { Plugin } from 'rollup';
 import { createFilter } from '@rollup/pluginutils';
 
 import type { FuncMacroOptions } from './global.js';
+import type { NameGetter } from './types/private.js';
 import { normalize } from './core/normalize.js';
-import { replaceIdentifiers } from './core/replace.js';
+import { replaceIdentifiersBatch } from './core/replace.js';
 import { findFunctionNameAtPosition } from './core/find-name.js';
 
 /**
@@ -27,44 +28,45 @@ export function funcMacro(options?: Partial<FuncMacroOptions>): Plugin {
       }
 
       const filename = basename(id);
-      let changed = false;
-      let result = code;
+      const targets: {
+        identifier: string;
+        nameGetter: NameGetter;
+      }[] = [];
 
       if (opts.identifier !== null) {
         if (code.includes(opts.identifier)) {
-          const transformed = replaceIdentifiers({
-            code: result,
+          targets.push({
             identifier: opts.identifier,
             nameGetter: findFunctionNameAtPosition,
-            fallback: opts.fallback,
-            stringReplace: opts.stringReplace,
           });
-
-          if (transformed !== null) {
-            result = transformed;
-            changed = true;
-          }
         }
       }
 
       if (opts.fileIdentifier !== null) {
         if (code.includes(opts.fileIdentifier)) {
-          const transformed = replaceIdentifiers({
-            code: result,
+          targets.push({
             identifier: opts.fileIdentifier,
             nameGetter: () => filename,
-            fallback: opts.fallback,
-            stringReplace: opts.stringReplace,
           });
-
-          if (transformed !== null) {
-            result = transformed;
-            changed = true;
-          }
         }
       }
 
-      return changed ? { code: result, map: null } : null;
+      if (targets.length === 0) {
+        return null;
+      }
+
+      const transformed = replaceIdentifiersBatch({
+        code,
+        targets,
+        fallback: opts.fallback,
+        stringReplace: opts.stringReplace,
+      });
+
+      if (transformed === null || transformed === code) {
+        return null;
+      }
+
+      return { code: transformed, map: null };
     },
   };
 }

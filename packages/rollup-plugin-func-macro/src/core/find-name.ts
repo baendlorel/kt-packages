@@ -10,6 +10,18 @@ import { simple } from 'acorn-walk';
 import type { FunctionContext, FunctionNode } from '../types/private.js';
 import { between, Consts } from '../common.js';
 
+interface InvalidRange {
+  start: number;
+  end: number;
+}
+
+interface CachedContexts {
+  funcs: FunctionContext[];
+  invalidRanges: InvalidRange[];
+}
+
+const contextCache = new WeakMap<Node, CachedContexts>();
+
 /**
  * Find function name at a specific position in the code
  *
@@ -20,6 +32,23 @@ import { between, Consts } from '../common.js';
  * @returns function name
  */
 export function findFunctionNameAtPosition(code: string, ast: Node, position: number, fallback: string): string {
+  const context = getCachedContexts(code, ast);
+  for (let i = 0; i < context.invalidRanges.length; i++) {
+    const range = context.invalidRanges[i];
+    if (between(position, range.start, range.end)) {
+      return Consts.InvalidUsingMacroInMethodName;
+    }
+  }
+
+  return findClosestName(context.funcs, position, fallback);
+}
+
+function getCachedContexts(code: string, ast: Node): CachedContexts {
+  const cached = contextCache.get(ast);
+  if (cached) {
+    return cached;
+  }
+
   const funcs: FunctionContext[] = [];
   const add = (node: FunctionNode, name: string) =>
     funcs.push({
@@ -28,9 +57,6 @@ export function findFunctionNameAtPosition(code: string, ast: Node, position: nu
       end: node.end,
     });
 
-  // console.dir(ast, { depth: 12 });
-
-  // Collect all function contexts
   simple(ast, {
     FunctionDeclaration(node: FunctionDeclaration | AnonymousFunctionDeclaration) {
       add(node, node.id?.name ?? Consts.AnonymousFunction);
@@ -58,59 +84,61 @@ export function findFunctionNameAtPosition(code: string, ast: Node, position: nu
     },
   });
 
-  const deduped = dedup(funcs, position);
-  if (deduped === null) {
-    return Consts.InvalidUsingMacroInMethodName;
-  }
-
-  return findClosestName(deduped, position, fallback);
+  const normalized = normalizeContexts(funcs);
+  contextCache.set(ast, normalized);
+  return normalized;
 }
 
-/**
- * # Weird Case
- * From the script below, acorn will detect **2** methods with the same `node.end`.
- * One is anonymous, one is named.
- *
- * So we only keep the named one.
- *
- * ```ts
- * class TestClass {
- *   ['dynamicMethod']() {
- *     console.log("dynamicMethod");
- *   }
- * };
- * ```
- */
-function dedup(funcs: FunctionContext[], position: number): FunctionContext[] | null {
-  const filtered: FunctionContext[] = [];
+function normalizeContexts(funcs: FunctionContext[]): CachedContexts {
+  const groupedByEnd = new Map<number, FunctionContext[]>();
   for (let i = 0; i < funcs.length; i++) {
     const func = funcs[i];
+    const group = groupedByEnd.get(func.end);
+    if (!group) {
+      groupedByEnd.set(func.end, [func]);
+      continue;
+    }
+    group.push(func);
+  }
 
-    const index = filtered.findIndex((f) => f.end === func.end);
-    if (index === -1) {
-      filtered.push(func);
+  const filtered: FunctionContext[] = [];
+  const invalidRanges: InvalidRange[] = [];
+  for (const sameEndFuncs of groupedByEnd.values()) {
+    if (sameEndFuncs.length === 1) {
+      filtered.push(sameEndFuncs[0]);
       continue;
     }
 
-    /**
-     * & If `position` appears between this 2 nodes's `start`, this is the case that using `__func__` in the method name
-     * ! This is the invalid using
-     * ```ts
-     * class TestClass {
-     *   ['dynamicMethod'+ __func__]() {
-     *   }
-     * }
-     * ```
-     */
-    if (between(position, func.start, filtered[index].start)) {
-      return null;
+    let current = sameEndFuncs[0];
+    let minStart = current.start;
+    let maxStart = current.start;
+
+    for (let i = 1; i < sameEndFuncs.length; i++) {
+      const func = sameEndFuncs[i];
+      if (current.start >= func.start) {
+        current = func;
+      }
+      if (func.start < minStart) {
+        minStart = func.start;
+      }
+      if (maxStart < func.start) {
+        maxStart = func.start;
+      }
     }
 
-    if (filtered[index].start >= func.start) {
-      filtered[index] = func;
+    filtered.push(current);
+    if (minStart !== maxStart) {
+      invalidRanges.push({
+        start: minStart,
+        end: maxStart,
+      });
     }
   }
-  return filtered;
+
+  return {
+    funcs: filtered,
+    invalidRanges,
+  };
 }
 
 function findClosestName(funcs: FunctionContext[], position: number, fallback: string): string {
