@@ -1,19 +1,8 @@
 import { ElseIfNode, ElseNode, EndIfNode, IfNode, IfStatement, IfType } from '../types/if.js';
 
-const REG = /^\s*\/\/\s*#(if|elseif|else|endif)\b/;
-function getType(code: string): { type: IfType | null; condition: string } {
-  let tp: IfType | null = null;
-  const replaced = code.replace(REG, (_, t) => {
-    if (t === 'elif') {
-      throw new SyntaxError(`#elif is no longer supported. Use #elseif instead.`);
-    }
-    tp = t;
-    return '';
-  });
-
-  return { type: tp, condition: replaced };
-}
-
+/**
+ * Parse the full code to `IfNode` array.
+ */
 export function parse(code: string): IfNode[] {
   const rawLines = code.split('\n');
   if (rawLines.length === 0) {
@@ -121,6 +110,20 @@ export function parse(code: string): IfNode[] {
   }
 
   return ifNodes;
+}
+
+const REG = /^\s*\/\/\s*#(if|elseif|else|endif)\b/;
+function getType(code: string): { type: IfType | null; condition: string } {
+  let tp: IfType | null = null;
+  const replaced = code.replace(REG, (_, t) => {
+    if (t === 'elif') {
+      throw new SyntaxError(`#elif is no longer supported. Use #elseif instead.`);
+    }
+    tp = t;
+    return '';
+  });
+
+  return { type: tp, condition: replaced };
 }
 
 const thenIf = (stack: IfStatement[], current: IfNode) => {
