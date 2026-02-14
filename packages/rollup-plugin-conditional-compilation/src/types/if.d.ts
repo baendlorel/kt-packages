@@ -1,4 +1,4 @@
-interface CodeRange {
+interface IfNodeBase {
   /**
    * Start position of the Node
    */
@@ -11,29 +11,29 @@ interface CodeRange {
   end: number;
 }
 
-export interface IfNode extends CodeRange {
+export interface IfNode extends IfNodeBase {
   type: 'if';
   condition: string;
   body: IfStatement[];
   elseIfs: ElseIfNode[];
-  else?: ElseNode;
+  else: ElseNode | undefined;
   endIf: EndIfNode;
 }
 
-export interface ElseIfNode extends CodeRange {
+export interface ElseIfNode extends IfNodeBase {
   type: 'elseif';
   condition: string;
   body: IfStatement[];
   belong: IfNode;
 }
 
-export interface ElseNode extends CodeRange {
+export interface ElseNode extends IfNodeBase {
   type: 'else';
   body: IfStatement[];
   belong: IfNode;
 }
 
-export interface EndIfNode extends CodeRange {
+export interface EndIfNode extends IfNodeBase {
   type: 'endif';
   belong: IfNode;
 }

@@ -4,6 +4,7 @@ const REG = /^\s*\/\/\s*#(if|elseif|else|endif)\b/;
 function getType(code: string): { type: IfType | null; condition: string } {
   let tp: IfType | null = null;
   const replaced = code.replace(REG, (_, t) => ((tp = t), ''));
+
   return { type: tp, condition: replaced };
 }
 
@@ -15,8 +16,8 @@ export function parse(code: string): IfNode[] {
 
   // detect if statements
   const lines: IfStatement[] = [];
-  let end = rawLines[0].length;
-  for (let i = 1; i < rawLines.length; i++) {
+  let end = 0;
+  for (let i = 0; i < rawLines.length; i++) {
     const content = rawLines[i];
     // Only when this line is a if statement
     const tp = getType(content);
@@ -30,12 +31,13 @@ export function parse(code: string): IfNode[] {
     if (tp.type === 'if') {
       const node: IfNode = {
         type: 'if',
-        condition: content,
+        condition: tp.condition,
         body: [],
         elseIfs: [],
         start,
         end,
         endIf: null as any,
+        else: undefined,
       };
       lines.push(node);
       continue;
@@ -86,12 +88,12 @@ export function parse(code: string): IfNode[] {
     throw new SyntaxError(`Only one if statement found (#${lines[0].type}), which is invalid. Ignoring it.`);
   }
   if (lines[0].type !== 'if') {
-    throw new SyntaxError(`The first directive must be #if, but found #${lines[0].type}.`);
+    throw new SyntaxError(`Must start with #if, got #${lines[0].type}.`);
   }
 
   // build the tree structure of if statements
-  const ifNodes: IfNode[] = [];
-  const stack: IfStatement[] = [];
+  const ifNodes: IfNode[] = [lines[0]];
+  const stack: IfStatement[] = [lines[0]];
   for (let i = 1; i < lines.length; i++) {
     const current = lines[i];
     if (current.type === 'if') {
