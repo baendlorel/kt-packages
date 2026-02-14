@@ -65,6 +65,32 @@ console.log('feature-off');
     expect(result.code).not.toContain("console.log('feature-off');");
   });
 
+  it('keeps closure behavior of function variables', () => {
+    const threshold = 10;
+    const code = `// #if CHECK(12)
+console.log('hit');
+// #else
+console.log('miss');
+// #endif
+`;
+    const nodes = parse(code);
+    const result = apply(code, nodes, {
+      CHECK: (n: number) => n > threshold,
+    });
+
+    expect(result.code).toContain("console.log('hit');");
+    expect(result.code).not.toContain("console.log('miss');");
+  });
+
+  it('throws when variable names are not valid identifiers', () => {
+    const code = `// #if FLAG
+console.log('ok');
+// #endif
+`;
+    const nodes = parse(code);
+    expect(() => apply(code, nodes, { 'bad-key': true })).toThrow(/Invalid variable name/);
+  });
+
   it('generates sourcemap with expected basic fields', () => {
     const code = loadjs('case9.js');
     const nodes = parse(code);

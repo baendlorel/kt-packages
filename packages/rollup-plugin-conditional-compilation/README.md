@@ -1,4 +1,4 @@
-# Conditional Compilation
+# Rollup Plugin Conditional Compilation
 
 [![npm version](https://img.shields.io/npm/v/rollup-plugin-conditional-compilation.svg)](https://www.npmjs.com/package/rollup-plugin-conditional-compilation) [![npm downloads](http://img.shields.io/npm/dm/rollup-plugin-conditional-compilation.svg)](https://npmcharts.com/compare/rollup-plugin-conditional-compilation,token-types?start=1200&interval=30)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/59dd6795e61949fb97066ca52e6097ef)](https://www.codacy.com/app/Borewit/rollup-plugin-conditional-compilation?utm_source=github.com&utm_medium=referral&utm_content=Borewit/rollup-plugin-conditional-compilation&utm_campaign=Badge_Grade)
@@ -63,9 +63,12 @@ export default {
 ### Syntax
 
 - Single-line directives only: `// #if <expression>`, `// #else`, `// #elseif <expression>` and `// #endif`.
+  - This is strictly followed, so `//// #if` , `/* #if ... */` or `// # if ...` will not work.
 - The `<expression>` is evaluated at build time with the keys from `variables` available as identifiers.
-  - You can write **literally ANY JavaScript expressions** in it, because it is evaluated as an IIFE (Immediately Invoked Function Expression).
-  - Supported directives: `#if`, `#else`, `#elseif`, `#endif` (similar to C/C++ style conditional compilation).
+  - You can write **literally ANY JavaScript expressions** in it, because it is evaluated with the `Function` constructor.
+  - Variable values are passed directly as runtime arguments (not JSON-serialized), so functions/objects/Date/Map/Symbol can be used in conditions.
+  - Variable keys must be valid JavaScript identifiers (for example, `DEBUG` is valid while `feature-x` is invalid).
+  - Supported directives: `#if`, `#else`, `#elseif`, `#endif`.
 - Since it is `if/else` , it follows the syntax of `if/else` statements
 
 ### Example
@@ -94,7 +97,7 @@ console.log('always');
 
 ## Behaviors
 
-- **AST Parsing**: Using Acorn with `{ ecmaVersion: "latest", sourceType: "module" }` by default to parse the code, so it supports the latest JavaScript syntax and ES modules.
+- **Directive Parsing**: v2 no longer depends on Acorn. It scans source lines for `// #if/#elseif/#else/#endif` directives only.
 
 - **Directive Style**: Only `//` comments are scanned for directives; block comments (`/* ... */`) are ignored.
   - Reason 1: block comments can span multiple lines with `*` ahead and may contain nested comments, making parsing more complex and error-prone.

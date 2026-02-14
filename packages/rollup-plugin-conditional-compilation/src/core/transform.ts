@@ -188,14 +188,20 @@ function mergeRanges(ranges: Array<{ start: number; end: number }>): Array<{ sta
   return merged;
 }
 
+const IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+
 function createEvaluator(variables: Record<string, unknown>): ConditionEvaluator {
   const entries = Object.entries(variables);
   const names: string[] = [];
   const values: unknown[] = [];
 
   for (let i = 0; i < entries.length; i++) {
-    names.push(entries[i][0]);
-    values.push(entries[i][1]);
+    const [name, value] = entries[i];
+    if (!IDENTIFIER.test(name)) {
+      throw new SyntaxError(`Invalid variable name '${name}', expected a valid JavaScript identifier.`);
+    }
+    names.push(name);
+    values.push(value);
   }
 
   if (names.length === 0) {
