@@ -26,9 +26,10 @@ export function apply(
 ): TransformResult {
   const magicString = new MagicString(code, { filename: options.filename });
   const rangesToDrop: Array<{ start: number; end: number }> = [];
+  const initializeVarsCode = initializeVars(values);
 
   for (let i = 0; i < nodes.length; i++) {
-    collectDrops(nodes[i], values, rangesToDrop);
+    collectDrops(nodes[i], initializeVarsCode, rangesToDrop);
   }
 
   const merged = mergeRanges(rangesToDrop);
@@ -49,7 +50,7 @@ export function apply(
   };
 }
 
-function collectDrops(node: IfNode, values: Record<string, unknown>, ranges: Array<{ start: number; end: number }>) {
+function collectDrops(node: IfNode, initializeVarsCode: string, ranges: Array<{ start: number; end: number }>) {
   const ifLineStart = toIndexStart(node.start);
   const ifLineEnd = node.end;
   const endIfLineStart = toIndexStart(node.endIf.start);
@@ -74,7 +75,7 @@ function collectDrops(node: IfNode, values: Record<string, unknown>, ranges: Arr
       break;
     }
 
-    if (evaluate(branch.condition, values)) {
+    if (evaluate(branch.condition, initializeVarsCode)) {
       chosenIndex = i;
       break;
     }
@@ -88,7 +89,7 @@ function collectDrops(node: IfNode, values: Record<string, unknown>, ranges: Arr
     }
 
     for (let j = 0; j < branch.nested.length; j++) {
-      collectDrops(branch.nested[j], values, ranges);
+      collectDrops(branch.nested[j], initializeVarsCode, ranges);
     }
   }
 }
@@ -180,9 +181,18 @@ function mergeRanges(ranges: Array<{ start: number; end: number }>): Array<{ sta
   return merged;
 }
 
-function evaluate(condition: string, values: Record<string, unknown>): boolean {
-  const keys = Object.keys(values);
-  const vals = keys.map((k) => values[k]);
-  const fn = new Function(...keys, `return (${condition});`) as (...args: unknown[]) => unknown;
-  return Boolean(fn(...vals));
+function initializeVars(variables: Record<string, unknown>): string {
+  const list: string[] = [];
+  for (const key in variables) {
+    list.push(`${key} = ${JSON.stringify(variables[key])}`);
+  }
+  if (list.length === 0) {
+    return '';
+  }
+  return `var ${list.join(',')};`;
+}
+
+function evaluate(condition: string, initializeVarsCode: string): boolean {
+  const fn = new Function(`${initializeVarsCode}return (${condition});`);
+  return Boolean(fn());
 }

@@ -1,5 +1,8 @@
 import type { Plugin } from 'rollup';
-import { RollupConditionalCompilationOptions } from './types/global.js';
+import type { RollupConditionalCompilationOptions } from './types/global.js';
+import { ECMA_VERSIONS, SOURCE_TYPES } from './misc/consts.js';
+import { parse } from './core/parse.js';
+import { apply } from './core/transform.js';
 
 /**
  * ## Usage
@@ -15,21 +18,20 @@ export default function conditionalCompilation(options: Partial<RollupConditiona
     name: '__KEBAB_NAME__',
     transform(code: string, id: string) {
       try {
-        const result = parser.proceed(code);
-
-        // If no conditional compilation directives found, return null
-        if (!result) {
+        if (!code.includes('#if')) {
           return null;
         }
 
-        // Generate sourcemap for the transformed code
-        const map = createSourceMap(code, result.keptRanges, {
-          filename: id,
-        });
+        const ifNodes = parse(code);
+        if (ifNodes.length === 0) {
+          return null;
+        }
+
+        const result = apply(code, ifNodes, opts.variables, { filename: id });
 
         return {
           code: result.code,
-          map,
+          map: result.map,
         };
       } catch (error) {
         console.error('parsing error occured:', error);
@@ -50,12 +52,12 @@ function normalize(options: Partial<RollupConditionalCompilationOptions>): Rollu
     throw new Error(`Invalid variables: '${variables}', must be an object`);
   }
 
-  if (!Consts.EcmaVersions.split(',').includes(String(ecmaVersion))) {
-    throw new Error(`Invalid ecmaVersion: '${ecmaVersion}', must be one of ${Consts.EcmaVersions}`);
+  if (!ECMA_VERSIONS.includes(ecmaVersion)) {
+    throw new Error(`Invalid ecmaVersion: '${ecmaVersion}', must be one of ${ECMA_VERSIONS.join(',')}`);
   }
 
-  if (!Consts.SourceType.split(',').includes(sourceType)) {
-    throw new Error(`Invalid sourceType: '${sourceType}', must be one of ${Consts.SourceType}`);
+  if (!SOURCE_TYPES.includes(sourceType)) {
+    throw new Error(`Invalid sourceType: '${sourceType}', must be one of ${SOURCE_TYPES.join(',')}`);
   }
 
   if (typeof expressionCache !== 'boolean') {
