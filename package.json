@@ -6,6 +6,7 @@
 	"type": "module",
 	"packageManager": "pnpm@10.9.0",
 	"scripts": {
+		"manifest": "tsx ./.scripts/manifest.ts",
 		"lines": "tsx ./.scripts/lines.ts",
 		"build": "tsx ./.scripts/index.ts --build",
 		"pub": "tsx ./.scripts/index.ts --publish",
